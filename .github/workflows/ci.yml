@@ -13,72 +13,55 @@ concurrency:
 jobs:
   commits:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: ${{ github.event_name == 'pull_request' && '0' || '2' }}
 
       - name: Validate commit messages
         run: |
           # Clean Commit format: <emoji> <type>[!][(<scope>)]: <description>
-          # Emojis: 📦🔧🗑️🔒⚙️☕🧪📖🚀
-          # Types: new, update, remove, security, setup, chore, test, docs, release
-
           COMMIT_PATTERN='^[📦🔧🗑️🔒⚙️☕🧪📖🚀🔁]\s+(new|update|remove|security|setup|chore|test|docs|release)(\([^)]+\))?!?:\s+.+$'
 
-          # Get commits between PR base and head
-          COMMITS=$(git log --pretty=format:"%s" origin/${{ github.base_ref }}..HEAD)
+          # Get commits based on event type
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            COMMITS=$(git log --pretty=format:"%s" origin/${{ github.base_ref }}..HEAD)
+          else
+            COMMITS=$(git log -1 --pretty=format:"%s")
+          fi
 
           INVALID_COMMITS=""
 
           while IFS= read -r commit; do
-            # Skip empty lines
             [ -z "$commit" ] && continue
 
             # Skip merge commits
-            if [[ "$commit" =~ ^Merge\  ]]; then
-              echo "✅ Skipping merge commit: $commit"
-              continue
-            fi
+            [[ "$commit" =~ ^Merge\  ]] && echo "✅ Skipping merge: $commit" && continue
 
-            # Skip "Initial plan" commits (Claude Agent compatibility)
-            if [[ "$commit" == "Initial plan" ]]; then
-              echo "✅ Skipping initial plan commit: $commit"
-              continue
-            fi
+            # Skip "Initial plan" (Claude Agent)
+            [[ "$commit" == "Initial plan" ]] && echo "✅ Skipping initial plan" && continue
 
-            # Validate commit format
+            # Validate format
             if ! [[ "$commit" =~ $COMMIT_PATTERN ]]; then
               INVALID_COMMITS="$INVALID_COMMITS\n  - $commit"
             fi
           done <<< "$COMMITS"
 
           if [ -n "$INVALID_COMMITS" ]; then
-            echo "❌ Invalid commit messages found:"
+            echo "❌ Invalid commits:"
             echo -e "$INVALID_COMMITS"
             echo ""
-            echo "Commit format: <emoji> <type>[!][(<scope>)]: <description>"
+            echo "Format: <emoji> <type>[!][(<scope>)]: <description>"
             echo ""
-            echo "Valid emojis and types:"
-            echo "  📦 new      - New feature"
-            echo "  🔧 update   - Update existing feature"
-            echo "  🗑️ remove   - Remove code/feature"
-            echo "  🔒 security - Security fix"
-            echo "  ⚙️ setup    - Setup/configuration"
-            echo "  ☕ chore    - Maintenance task"
-            echo "  🧪 test     - Test related"
-            echo "  📖 docs     - Documentation"
-            echo "  🚀 release  - Release"
+            echo "Valid: 📦new 🔧update 🗑️remove 🔒security ⚙️setup ☕chore 🧪test 📖docs 🚀release"
             echo ""
             echo "Examples:"
             echo "  📦 new: add user authentication"
             echo "  🔧 update(chat): improve message rendering"
-            echo "  🗑️ remove!: deprecated API endpoints"
             exit 1
           fi
 
-          echo "✅ All commit messages are valid"
+          echo "✅ All commits valid"
 
   lint:
     runs-on: ubuntu-latest
