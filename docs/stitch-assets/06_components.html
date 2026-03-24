@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;family=Noto+Sans+SC:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-primary-fixed": "#31414f",
+                        "secondary-dim": "#4c545a",
+                        "primary-container": "#d4e4f7",
+                        "primary-dim": "#455463",
+                        "secondary-fixed": "#dce3eb",
+                        "tertiary-fixed": "#dee3ea",
+                        "on-secondary-fixed-variant": "#545d63",
+                        "secondary-fixed-dim": "#cdd5dc",
+                        "surface-bright": "#f8f9fa",
+                        "surface-tint": "#506070",
+                        "background": "#f8f9fa",
+                        "on-background": "#2b3437",
+                        "on-surface": "#2b3437",
+                        "outline-variant": "#abb3b7",
+                        "on-tertiary": "#f6f9ff",
+                        "on-secondary-fixed": "#384046",
+                        "error-container": "#fe8983",
+                        "surface-container-lowest": "#ffffff",
+                        "error-dim": "#4e0309",
+                        "outline": "#737c7f",
+                        "surface-container-high": "#e3e9ec",
+                        "primary-fixed": "#d4e4f7",
+                        "tertiary-container": "#dee3ea",
+                        "surface-variant": "#dbe4e7",
+                        "on-primary-container": "#445362",
+                        "on-tertiary-container": "#4d5258",
+                        "secondary": "#586066",
+                        "surface-container": "#eaeff1",
+                        "on-secondary-container": "#4b5359",
+                        "on-primary": "#f4f8ff",
+                        "on-error-container": "#752121",
+                        "on-error": "#fff7f6",
+                        "error": "#9f403d",
+                        "tertiary-dim": "#4e5459",
+                        "on-surface-variant": "#586064",
+                        "inverse-on-surface": "#9b9d9e",
+                        "primary": "#506070",
+                        "surface-container-highest": "#dbe4e7",
+                        "surface-container-low": "#f1f4f6",
+                        "tertiary-fixed-dim": "#d0d5dc",
+                        "inverse-surface": "#0c0f10",
+                        "surface-dim": "#d1dce0",
+                        "on-secondary": "#f4f9ff",
+                        "on-tertiary-fixed": "#3a4045",
+                        "tertiary": "#5a6066",
+                        "primary-fixed-dim": "#c6d6e8",
+                        "on-tertiary-fixed-variant": "#565c62",
+                        "surface": "#f8f9fa",
+                        "inverse-primary": "#daeafd",
+                        "on-primary-fixed-variant": "#4e5d6d",
+                        "secondary-container": "#dce3eb"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope", "Noto Sans SC"],
+                        "body": ["Manrope", "Noto Sans SC"],
+                        "label": ["Manrope", "Noto Sans SC"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            font-family: 'Manrope', 'Noto Sans SC', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .lunar-glass {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .halo-shadow {
+            box-shadow: 0 0 20px rgba(80, 96, 112, 0.05);
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(80, 96, 112, 0.08);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm shadow-blue-100/20 flex justify-between items-center h-16 px-6">
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-slate-700 dark:text-slate-200 hover:bg-white/50 transition-colors p-2 rounded-full" style="">search</button>
+</div>
+<h1 class="text-2xl font-bold tracking-tighter text-slate-800 dark:text-slate-100 drop-shadow-[0_0_8px_rgba(176,196,222,0.6)] font-['Manrope']" style="">月枢</h1>
+<div class="w-10 h-10"></div>
+</header>
+<main class="pt-24 px-6 max-w-7xl mx-auto">
+<!-- Hero Section -->
+<section class="mb-12">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h2 class="text-4xl font-light tracking-tight text-on-background mb-2" style="">空间扩展</h2>
+<p class="text-on-surface-variant max-w-md font-light leading-relaxed" style="">
+                        为您的数字空间部署智能助手。每个模块都由你的对话自生成，你可随时添加到你的空间！</p>
+</div>
+<div class="flex gap-2 text-sm">
+<span class="px-4 py-1.5 rounded-full bg-surface-container text-on-surface-variant font-medium" style="">全部模块</span>
+<span class="px-4 py-1.5 rounded-full hover:bg-surface-container-high transition-colors text-outline font-medium cursor-pointer" style="">常用</span>
+<span class="px-4 py-1.5 rounded-full hover:bg-surface-container-high transition-colors text-outline font-medium cursor-pointer" style="">专业工具</span>
+</div>
+</div>
+</section>
+<!-- Bento Grid Library -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Financial System Card -->
+<div class="group card-hover transition-all duration-500 bg-surface-container-lowest rounded-[2rem] p-8 flex flex-col justify-between border border-transparent hover:border-primary-container/30 halo-shadow">
+<div class="mb-8">
+<div class="w-14 h-14 rounded-2xl bg-primary-container/40 flex items-center justify-center mb-6 text-primary">
+<span class="material-symbols-outlined text-3xl" style="">account_balance_wallet</span>
+</div>
+<h3 class="text-xl font-bold text-on-surface mb-3 tracking-tight" style="">财务系统</h3>
+<p class="text-on-surface-variant text-sm font-light leading-relaxed" style="">
+                        多维度收支追踪与智能对账。支持多种货币自动汇率换算，为您生成精美的可视化月度财务透视图。
+                    </p>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs font-semibold tracking-wider text-outline-variant uppercase" style="">Financial Agent</span>
+<button class="px-6 py-2.5 rounded-full bg-gradient-to-r from-primary to-primary-dim text-on-primary text-sm font-medium shadow-[0_4px_12px_rgba(80,96,112,0.15)] hover:shadow-[0_8px_20px_rgba(80,96,112,0.25)] transition-all active:scale-95" style="">部署</button>
+</div>
+</div>
+<!-- File Manager Card -->
+<div class="group card-hover transition-all duration-500 bg-surface-container-lowest rounded-[2rem] p-8 flex flex-col justify-between border border-transparent hover:border-primary-container/30 halo-shadow">
+<div class="mb-8">
+<div class="w-14 h-14 rounded-2xl bg-secondary-container/50 flex items-center justify-center mb-6 text-secondary">
+<span class="material-symbols-outlined text-3xl" style="">folder_managed</span>
+</div>
+<h3 class="text-xl font-bold text-on-surface mb-3 tracking-tight" style="">文件管理器</h3>
+<p class="text-on-surface-variant text-sm font-light leading-relaxed" style="">
+                        基于 AI 的文件索引与归档。自动识别文件类型，智能提取文档摘要，让您的云端存储井然有序。
+                    </p>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs font-semibold tracking-wider text-outline-variant uppercase" style="">Storage Hub</span>
+<button class="px-6 py-2.5 rounded-full bg-gradient-to-r from-primary to-primary-dim text-on-primary text-sm font-medium shadow-[0_4px_12px_rgba(80,96,112,0.15)] hover:shadow-[0_8px_20px_rgba(80,96,112,0.25)] transition-all active:scale-95" style="">部署</button>
+</div>
+</div>
+<!-- Task Tracker Card (Special Large Variant) -->
+<div class="group card-hover transition-all duration-500 bg-surface-container-lowest rounded-[2rem] p-8 flex flex-col justify-between border border-transparent hover:border-primary-container/30 halo-shadow lg:row-span-2">
+<div class="mb-8">
+<div class="w-14 h-14 rounded-2xl bg-tertiary-container/50 flex items-center justify-center mb-6 text-tertiary">
+<span class="material-symbols-outlined text-3xl" style="">task_alt</span>
+</div>
+<h3 class="text-xl font-bold text-on-surface mb-3 tracking-tight" style="">任务追踪</h3>
+<p class="text-on-surface-variant text-sm font-light leading-relaxed mb-6" style="">
+                        不止是清单。整合番茄时钟与甘特图，动态分配您的每日精力。集成自动化提醒，确保每一项重要委托都能准时达成。
+                    </p>
+<div class="space-y-3">
+<div class="p-4 rounded-xl bg-surface-container-low flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-sm" style="">auto_awesome</span>
+<span class="text-xs text-on-surface-variant" style="">智能排期优先级建议</span>
+</div>
+<div class="p-4 rounded-xl bg-surface-container-low flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-sm" style="">schedule</span>
+<span class="text-xs text-on-surface-variant" style="">跨设备实时同步提醒</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between mt-auto">
+<span class="text-xs font-semibold tracking-wider text-outline-variant uppercase" style="">Productivity Pro</span>
+<button class="px-6 py-2.5 rounded-full bg-gradient-to-r from-primary to-primary-dim text-on-primary text-sm font-medium shadow-[0_4px_12px_rgba(80,96,112,0.15)] hover:shadow-[0_8px_20px_rgba(80,96,112,0.25)] transition-all active:scale-95" style="">部署</button>
+</div>
+</div>
+<!-- Note Taker Card -->
+<div class="group card-hover transition-all duration-500 bg-surface-container-lowest rounded-[2rem] p-8 flex flex-col justify-between border border-transparent hover:border-primary-container/30 halo-shadow">
+<div class="mb-8">
+<div class="w-14 h-14 rounded-2xl bg-slate-200/50 flex items-center justify-center mb-6 text-slate-600">
+<span class="material-symbols-outlined text-3xl" style="">edit_note</span>
+</div>
+<h3 class="text-xl font-bold text-on-surface mb-3 tracking-tight" style="">笔记助手</h3>
+<p class="text-on-surface-variant text-sm font-light leading-relaxed" style="">
+                        第二大脑。采用 Markdown 原生支持，集成知识图谱可视化。随手记录灵感，AI 自动建立双向链接。
+                    </p>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs font-semibold tracking-wider text-outline-variant uppercase" style="">Knowledge Base</span>
+<button class="px-6 py-2.5 rounded-full bg-gradient-to-r from-primary to-primary-dim text-on-primary text-sm font-medium shadow-[0_4px_12px_rgba(80,96,112,0.15)] hover:shadow-[0_8px_20px_rgba(80,96,112,0.25)] transition-all active:scale-95" style="">部署</button>
+</div>
+</div>
+<!-- RSS Feed Card -->
+<div class="group card-hover transition-all duration-500 bg-surface-container-lowest rounded-[2rem] p-8 flex flex-col justify-between border border-transparent hover:border-primary-container/30 halo-shadow">
+<div class="mb-8">
+<div class="w-14 h-14 rounded-2xl bg-blue-100/40 flex items-center justify-center mb-6 text-blue-500">
+<span class="material-symbols-outlined text-3xl" style="">rss_feed</span>
+</div>
+<h3 class="text-xl font-bold text-on-surface mb-3 tracking-tight" style="">RSS 订阅</h3>
+<p class="text-on-surface-variant text-sm font-light leading-relaxed" style="">
+                        聚合您最信赖的信息源。无广告干扰的纯净阅读，智能过滤重复资讯，让价值内容主动寻找您。
+                    </p>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs font-semibold tracking-wider text-outline-variant uppercase" style="">News Aggregator</span>
+<button class="px-6 py-2.5 rounded-full bg-gradient-to-r from-primary to-primary-dim text-on-primary text-sm font-medium shadow-[0_4px_12px_rgba(80,96,112,0.15)] hover:shadow-[0_8px_20px_rgba(80,96,112,0.25)] transition-all active:scale-95" style="">部署</button>
+</div>
+</div>
+<!-- Placeholder for Future Additions -->
+<div class="group border-2 border-dashed border-outline-variant/30 rounded-[2rem] p-8 flex flex-col items-center justify-center gap-4 hover:bg-surface-container transition-colors cursor-pointer min-h-[280px]">
+<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center text-outline">
+<span class="material-symbols-outlined" style="">add</span>
+</div>
+<p class="text-sm font-medium text-on-surface-variant" style="">更多模块正在孵化中</p>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center pt-3 pb-8 px-8 bg-white/90 dark:bg-slate-950/90 backdrop-blur-xl rounded-t-[32px] border-t border-slate-100/50 dark:border-slate-800/50 shadow-[0_-10px_40px_rgba(0,0,0,0.03)]">
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-600 hover:opacity-80 transition-opacity" href="#" style="">
+<span class="material-symbols-outlined mb-1" style="">chat_bubble</span>
+<span class="font-['Manrope'] text-[11px] font-medium tracking-wide" style="">对话</span>
+</a>
+<a class="flex flex-col items-center justify-center text-blue-500 dark:text-blue-300 drop-shadow-[0_0_12px_rgba(80,96,112,0.4)] transform -translate-y-1" href="#" style="">
+<span class="material-symbols-outlined mb-1" style="">auto_awesome_motion</span>
+<span class="font-['Manrope'] text-[11px] font-medium tracking-wide" style="">空间</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-600 hover:opacity-80 transition-opacity" href="#" style="">
+<span class="material-symbols-outlined mb-1" style="">account_circle</span>
+<span class="font-['Manrope'] text-[11px] font-medium tracking-wide" style="">账户</span>
+</a>
+</nav>
+</body></html>

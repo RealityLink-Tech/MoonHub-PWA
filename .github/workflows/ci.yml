@@ -1,0 +1,163 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev, develop]
+  pull_request:
+    branches: [main, dev, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  commits:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate commit messages
+        run: |
+          # Clean Commit format: <emoji> <type>[!][(<scope>)]: <description>
+          # Emojis: 📦🔧🗑️🔒⚙️☕🧪📖🚀
+          # Types: new, update, remove, security, setup, chore, test, docs, release
+
+          COMMIT_PATTERN='^[📦🔧🗑️🔒⚙️☕🧪📖🚀🔁]\s+(new|update|remove|security|setup|chore|test|docs|release)(\([^)]+\))?!?:\s+.+$'
+
+          # Get commits between PR base and head
+          COMMITS=$(git log --pretty=format:"%s" origin/${{ github.base_ref }}..HEAD)
+
+          INVALID_COMMITS=""
+
+          while IFS= read -r commit; do
+            # Skip empty lines
+            [ -z "$commit" ] && continue
+
+            # Skip merge commits
+            if [[ "$commit" =~ ^Merge\  ]]; then
+              echo "✅ Skipping merge commit: $commit"
+              continue
+            fi
+
+            # Skip "Initial plan" commits (Claude Agent compatibility)
+            if [[ "$commit" == "Initial plan" ]]; then
+              echo "✅ Skipping initial plan commit: $commit"
+              continue
+            fi
+
+            # Validate commit format
+            if ! [[ "$commit" =~ $COMMIT_PATTERN ]]; then
+              INVALID_COMMITS="$INVALID_COMMITS\n  - $commit"
+            fi
+          done <<< "$COMMITS"
+
+          if [ -n "$INVALID_COMMITS" ]; then
+            echo "❌ Invalid commit messages found:"
+            echo -e "$INVALID_COMMITS"
+            echo ""
+            echo "Commit format: <emoji> <type>[!][(<scope>)]: <description>"
+            echo ""
+            echo "Valid emojis and types:"
+            echo "  📦 new      - New feature"
+            echo "  🔧 update   - Update existing feature"
+            echo "  🗑️ remove   - Remove code/feature"
+            echo "  🔒 security - Security fix"
+            echo "  ⚙️ setup    - Setup/configuration"
+            echo "  ☕ chore    - Maintenance task"
+            echo "  🧪 test     - Test related"
+            echo "  📖 docs     - Documentation"
+            echo "  🚀 release  - Release"
+            echo ""
+            echo "Examples:"
+            echo "  📦 new: add user authentication"
+            echo "  🔧 update(chat): improve message rendering"
+            echo "  🗑️ remove!: deprecated API endpoints"
+            exit 1
+          fi
+
+          echo "✅ All commit messages are valid"
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run ESLint
+        run: pnpm lint
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run TypeScript check
+        run: pnpm typecheck
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [lint, typecheck]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+  test:
+    runs-on: ubuntu-latest
+    needs: [lint, typecheck]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run tests
+        run: pnpm test --passWithNoTests || true

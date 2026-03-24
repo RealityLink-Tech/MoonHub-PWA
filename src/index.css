@@ -1,60 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&family=Noto+Sans+SC:wght@100;300;400;500;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-background: #0f172a;
-  --color-foreground: #f8fafc;
-  --color-card: #1e293b;
-  --color-card-foreground: #f8fafc;
-  --color-primary: #3b82f6;
-  --color-primary-foreground: #ffffff;
-  --color-secondary: #64748b;
-  --color-secondary-foreground: #ffffff;
-  --color-muted: #334155;
-  --color-muted-foreground: #94a3b8;
-  --color-accent: #8b5cf6;
-  --color-accent-foreground: #ffffff;
-  --color-destructive: #ef4444;
+  --font-sans: "Manrope", "Noto Sans SC", ui-sans-serif, system-ui, sans-serif;
+  --font-headline: "Manrope", "Noto Sans SC", ui-sans-serif, system-ui, sans-serif;
+
+  --color-primary: #506070;
+  --color-primary-dim: #455463;
+  /* Hover fill for solid primary controls (default / pill buttons, etc.) */
+  --color-primary-hover: #5d7288;
+  --color-primary-container: #d4e4f7;
+  --color-on-primary: #f4f8ff;
+  --color-on-primary-container: #445362;
+
+  --color-secondary: #586066;
+  --color-secondary-dim: #4c545a;
+  --color-secondary-container: #dce3eb;
+
+  --color-tertiary: #5a6066;
+  --color-tertiary-dim: #4e5459;
+  --color-tertiary-container: #dee3ea;
+
+  --color-error: #9f403d;
+  --color-error-container: #fe8983;
+  --color-destructive: #9f403d;
   --color-destructive-foreground: #ffffff;
-  --color-border: #334155;
-  --color-input: #1e293b;
-  --color-ring: #3b82f6;
-  --radius-sm: 0.25rem;
-  --radius-md: 0.375rem;
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.75rem;
+
+  --color-background: #f8f9fa;
+  --color-on-background: #2b3437;
+
+  --color-surface: #f8f9fa;
+  --color-surface-dim: #d1dce0;
+  --color-surface-bright: #f8f9fa;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f1f4f6;
+  --color-surface-container: #eaeff1;
+  --color-surface-container-high: #e3e9ec;
+  --color-surface-container-highest: #dbe4e7;
+  --color-on-surface: #2b3437;
+  --color-on-surface-variant: #586064;
+
+  --color-outline: #737c7f;
+  --color-outline-variant: #abb3b7;
 }
 
-@layer base {
-  * {
-    @apply border-border;
+@layer components {
+  /* Primary gradient actions (Button variant + DeviceCard CTA) */
+  .btn-gradient {
+    color: var(--color-on-primary);
+    background-image: linear-gradient(
+      135deg,
+      var(--color-primary) 0%,
+      var(--color-primary-dim) 100%
+    );
+    transition: filter 0.2s ease, box-shadow 0.2s ease;
+  }
+  .btn-gradient:hover {
+    filter: brightness(1.06);
+  }
+  .btn-gradient:active {
+    filter: brightness(0.96);
   }
 
-  body {
-    @apply bg-background text-foreground antialiased;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Frosted pill / secondary emphasis (Button glass variant) */
+  .btn-glass {
+    color: var(--color-on-surface);
+    background: color-mix(in srgb, var(--color-surface-container-lowest) 58%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-outline-variant) 40%, transparent);
+    box-shadow: 0 1px 2px rgb(43 52 55 / 0.06);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+  .btn-glass:hover {
+    background: color-mix(in srgb, var(--color-surface-container-lowest) 72%, transparent);
+    border-color: color-mix(in srgb, var(--color-outline-variant) 55%, transparent);
   }
 
-  #root {
-    min-height: 100vh;
-    min-height: 100dvh;
+  /* App shell / cards (GlassCard, TopAppBar) */
+  .glass-panel {
+    background: color-mix(in srgb, var(--color-surface-container-lowest) 60%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .card-elevated {
+    background: var(--color-surface-container-lowest);
+    box-shadow: 0 4px 24px rgb(80 96 112 / 0.08);
+  }
+
+  .card-filled {
+    background: var(--color-surface-container);
+  }
+
+  .card-outlined {
+    background: transparent;
+    border: 1px solid var(--color-outline-variant);
+  }
+
+  .halo-effect {
+    box-shadow: 0 0 80px 20px rgb(80 96 112 / 0.05);
   }
 }
 
-/* Custom scrollbar for dark theme */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-on-background);
 }
 
-::-webkit-scrollbar-track {
-  background: var(--color-background);
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }
-
-::-webkit-scrollbar-thumb {
-  background: var(--color-muted);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-secondary);
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

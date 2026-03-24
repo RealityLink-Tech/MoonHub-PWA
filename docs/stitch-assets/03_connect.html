@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;family=Noto+Sans+SC:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary": "#f6f9ff",
+              "on-error": "#fff7f6",
+              "error-container": "#fe8983",
+              "surface-variant": "#dbe4e7",
+              "secondary-fixed-dim": "#cdd5dc",
+              "surface-container-highest": "#dbe4e7",
+              "background": "#f8f9fa",
+              "error-dim": "#4e0309",
+              "surface-tint": "#506070",
+              "outline": "#737c7f",
+              "surface-bright": "#f8f9fa",
+              "surface": "#f8f9fa",
+              "error": "#9f403d",
+              "secondary": "#586066",
+              "surface-container-low": "#f1f4f6",
+              "inverse-on-surface": "#9b9d9e",
+              "on-background": "#2b3437",
+              "inverse-primary": "#daeafd",
+              "on-primary-fixed": "#31414f",
+              "on-primary-container": "#445362",
+              "secondary-dim": "#4c545a",
+              "on-tertiary-fixed": "#3a4045",
+              "on-surface-variant": "#586064",
+              "secondary-fixed": "#dce3eb",
+              "inverse-surface": "#0c0f10",
+              "on-surface": "#2b3437",
+              "primary-fixed": "#d4e4f7",
+              "surface-container-high": "#e3e9ec",
+              "on-secondary-fixed-variant": "#545d63",
+              "on-primary-fixed-variant": "#4e5d6d",
+              "on-secondary-container": "#4b5359",
+              "on-tertiary-fixed-variant": "#565c62",
+              "on-secondary": "#f4f9ff",
+              "on-tertiary-container": "#4d5258",
+              "tertiary-dim": "#4e5459",
+              "secondary-container": "#dce3eb",
+              "primary": "#506070",
+              "surface-dim": "#d1dce0",
+              "on-secondary-fixed": "#384046",
+              "tertiary-fixed-dim": "#d0d5dc",
+              "surface-container": "#eaeff1",
+              "primary-fixed-dim": "#c6d6e8",
+              "tertiary-fixed": "#dee3ea",
+              "on-primary": "#f4f8ff",
+              "tertiary-container": "#dee3ea",
+              "tertiary": "#5a6066",
+              "primary-dim": "#455463",
+              "primary-container": "#d4e4f7",
+              "on-error-container": "#752121",
+              "outline-variant": "#abb3b7"
+            },
+            fontFamily: {
+              "headline": ["Manrope", "Noto Sans SC"],
+              "body": ["Manrope", "Noto Sans SC"],
+              "label": ["Manrope", "Noto Sans SC"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .lunar-halo {
+            box-shadow: 0 0 40px rgba(212, 228, 247, 0.4);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-body min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#f8f9fa]/80 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
+<div class="flex items-center justify-between px-6 h-16 w-full max-w-md mx-auto">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#d4e4f7]/30 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-[#506070]" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-['Manrope','PingFang_SC'] text-lg tracking-wider font-light text-[#506070]">设备连接</h1>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#d4e4f7]/30 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-[#506070]" data-icon="help_outline">help_outline</span>
+</button>
+</div>
+<div class="bg-gradient-to-b from-[#abb3b7]/10 to-transparent h-[1px]"></div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-24 px-8 w-full max-w-md mx-auto flex flex-col items-center pb-8">
+<!-- Device Info Section -->
+<section class="w-full mb-12 flex flex-col items-center">
+<div class="relative group">
+<!-- Backlight Halo -->
+<div class="absolute inset-0 bg-primary-container blur-3xl opacity-20 group-hover:opacity-40 transition-opacity rounded-full"></div>
+<div class="relative w-32 h-32 rounded-full bg-surface-container-lowest flex items-center justify-center lunar-halo border border-outline-variant/10">
+<span class="material-symbols-outlined text-primary text-5xl" data-icon="router" style="font-variation-settings: 'FILL' 1;">router</span>
+</div>
+</div>
+<div class="mt-6 text-center">
+<h2 class="text-xl font-headline font-semibold tracking-tight text-on-surface">Lunar Hub Pro</h2>
+<p class="text-sm text-on-surface-variant font-light mt-1 tracking-wide">等待授权连接...</p>
+</div>
+</section>
+<!-- Authorization Code Input -->
+<section class="w-full mb-8">
+<label class="block text-center text-xs font-label uppercase tracking-[0.2em] text-outline mb-6">请输入 6 位授权码</label>
+<div class="flex justify-between gap-2">
+<!-- Input slot 1 -->
+<div class="w-12 h-16 rounded-xl bg-surface-container-low border-b-2 border-outline-variant/30 flex items-center justify-center transition-all focus-within:border-primary focus-within:bg-surface-container-lowest focus-within:shadow-[0_4px_12px_rgba(80,96,112,0.1)]">
+<input class="w-full h-full bg-transparent border-none text-center text-2xl font-headline font-medium text-primary focus:ring-0" maxlength="1" type="text" value="8"/>
+</div>
+<!-- Input slot 2 -->
+<div class="w-12 h-16 rounded-xl bg-surface-container-low border-b-2 border-outline-variant/30 flex items-center justify-center transition-all focus-within:border-primary focus-within:bg-surface-container-lowest focus-within:shadow-[0_4px_12px_rgba(80,96,112,0.1)]">
+<input class="w-full h-full bg-transparent border-none text-center text-2xl font-headline font-medium text-primary focus:ring-0" maxlength="1" type="text" value="2"/>
+</div>
+<!-- Input slot 3 -->
+<div class="w-12 h-16 rounded-xl bg-surface-container-low border-b-2 border-outline-variant/30 flex items-center justify-center transition-all focus-within:border-primary focus-within:bg-surface-container-lowest focus-within:shadow-[0_4px_12px_rgba(80,96,112,0.1)]">
+<input class="w-full h-full bg-transparent border-none text-center text-2xl font-headline font-medium text-primary focus:ring-0" maxlength="1" placeholder="·" type="text"/>
+</div>
+<!-- Input slot 4 -->
+<div class="w-12 h-16 rounded-xl bg-surface-container-low border-b-2 border-outline-variant/30 flex items-center justify-center transition-all focus-within:border-primary focus-within:bg-surface-container-lowest focus-within:shadow-[0_4px_12px_rgba(80,96,112,0.1)]">
+<input class="w-full h-full bg-transparent border-none text-center text-2xl font-headline font-medium text-primary focus:ring-0" maxlength="1" placeholder="·" type="text"/>
+</div>
+<!-- Input slot 5 -->
+<div class="w-12 h-16 rounded-xl bg-surface-container-low border-b-2 border-outline-variant/30 flex items-center justify-center transition-all focus-within:border-primary focus-within:bg-surface-container-lowest focus-within:shadow-[0_4px_12px_rgba(80,96,112,0.1)]">
+<input class="w-full h-full bg-transparent border-none text-center text-2xl font-headline font-medium text-primary focus:ring-0" maxlength="1" placeholder="·" type="text"/>
+</div>
+<!-- Input slot 6 -->
+<div class="w-12 h-16 rounded-xl bg-surface-container-low border-b-2 border-outline-variant/30 flex items-center justify-center transition-all focus-within:border-primary focus-within:bg-surface-container-lowest focus-within:shadow-[0_4px_12px_rgba(80,96,112,0.1)]">
+<input class="w-full h-full bg-transparent border-none text-center text-2xl font-headline font-medium text-primary focus:ring-0" maxlength="1" placeholder="·" type="text"/>
+</div>
+</div>
+<!-- Connection Status Hint -->
+<p class="mt-6 text-center text-sm text-outline-variant font-light flex items-center justify-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-fixed-dim animate-pulse"></span>
+                授权码已发送至绑定的移动设备
+            </p>
+</section>
+<!-- Remember Device Option -->
+<section class="w-full mb-12 flex items-center justify-center gap-3">
+<div class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</div>
+<span class="text-sm font-light text-on-surface-variant tracking-wide">记住此设备</span>
+</section>
+<!-- Action Button -->
+<section class="w-full">
+<button class="w-full h-14 rounded-full bg-gradient-to-r from-primary to-primary-dim text-on-primary font-headline font-medium tracking-widest text-lg shadow-[0_8px_24px_rgba(80,96,112,0.25)] hover:shadow-[0_12px_32px_rgba(80,96,112,0.35)] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+<span>连接设备</span>
+<span class="material-symbols-outlined text-xl" data-icon="bolt">bolt</span>
+</button>
+<button class="w-full h-14 mt-4 rounded-full border border-outline-variant/20 text-on-surface-variant font-light tracking-wide text-sm hover:bg-surface-container-low transition-colors">
+                重新扫描设备
+            </button>
+</section>
+</main>
+<!-- BottomNavBar -->
+<!-- Background Decoration -->
+<div class="fixed top-0 left-0 w-full h-full -z-10 pointer-events-none overflow-hidden">
+<div class="absolute -top-[10%] -right-[10%] w-[60%] h-[60%] bg-primary-container/20 rounded-full blur-[120px]"></div>
+<div class="absolute bottom-[20%] -left-[5%] w-[40%] h-[40%] bg-surface-container-highest/30 rounded-full blur-[80px]"></div>
+</div>
+</body></html>

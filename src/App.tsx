@@ -1,112 +1,127 @@
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Wifi, Search, Settings, MessageCircle } from 'lucide-react'
+// ============================================================
+// App Component
+// 主应用 - 使用简单的视图导航与参考项目一致
+// ============================================================
 
-function App() {
-  const [isScanning, setIsScanning] = useState(false)
-  const [devices, setDevices] = useState<string[]>([])
+import { useState, useEffect } from 'react'
+import { AnimatePresence } from 'motion/react'
+import { SplashPage } from '@/pages/Splash'
+import { ChatPage } from '@/pages/Chat'
+import { SpacePage, SpaceExtensionPage } from '@/pages/Space'
+import { SettingsPage } from '@/pages/Settings'
+import type { SettingsSubPage } from '@/pages/Settings'
+import { DeviceDiscoveryPage } from '@/pages/DeviceDiscovery'
+import { DeviceConnectionPage } from '@/pages/DeviceConnection'
+import {
+  DevicesPage,
+  ModelConfigPage,
+  ChannelsPage,
+  PrivacyPage,
+  SkillsPage,
+  SystemConfigPage,
+} from '@/components/settings/SettingsSubPages'
+import { BottomNavBar } from '@/components/ui/BottomNavBar'
 
-  const handleScan = async () => {
-    setIsScanning(true)
-    // TODO: Implement local network device scanning
-    setTimeout(() => {
-      setDevices(['192.168.1.100:8080', '192.168.1.101:8080'])
-      setIsScanning(false)
-    }, 2000)
+export type ViewType =
+  | 'splash'
+  | 'chat'
+  | 'space'
+  | 'space_extension'
+  | 'account'
+  | 'device_discovery'
+  | 'device_connection'
+  | 'settings_devices'
+  | 'settings_model'
+  | 'settings_channels'
+  | 'settings_privacy'
+  | 'settings_skills'
+  | 'settings_system'
+
+export function App() {
+  const [view, setView] = useState<ViewType>('splash')
+  const [previousView, setPreviousView] = useState<ViewType>('chat')
+
+  const navigateTo = (newView: ViewType) => {
+    setPreviousView(view)
+    setView(newView)
   }
 
+  const navigateToSettingsSubPage = (page: SettingsSubPage) => {
+    navigateTo(`settings_${page}` as ViewType)
+  }
+
+  // After splash, go to chat
+  useEffect(() => {
+    if (view === 'splash') {
+      const timer = setTimeout(() => navigateTo('chat'), 2500)
+      return () => clearTimeout(timer)
+    }
+  }, [])
+
+  const renderSettingsSubPage = () => {
+    const onBack = () => navigateTo('account')
+
+    switch (view) {
+      case 'settings_devices':
+        return <DevicesPage onBack={onBack} />
+      case 'settings_model':
+        return <ModelConfigPage onBack={onBack} />
+      case 'settings_channels':
+        return <ChannelsPage onBack={onBack} />
+      case 'settings_privacy':
+        return <PrivacyPage onBack={onBack} />
+      case 'settings_skills':
+        return <SkillsPage onBack={onBack} />
+      case 'settings_system':
+        return <SystemConfigPage onBack={onBack} />
+      default:
+        return null
+    }
+  }
+
+  const isMainView = ['chat', 'space', 'account'].includes(view)
+  const isSettingsSubView = view.startsWith('settings_')
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-sm">
-        <div className="container flex h-14 items-center justify-between px-4">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <span className="text-sm font-bold text-primary-foreground">M</span>
-            </div>
-            <span className="font-semibold">MoonHub</span>
-          </div>
-          <Button variant="ghost" size="icon">
-            <Settings className="h-5 w-5" />
-          </Button>
-        </div>
-      </header>
+    <div className="min-h-screen bg-background text-on-background font-sans selection:bg-primary-container">
+      <AnimatePresence mode="wait">
+        {view === 'splash' && (
+          <SplashPage onFinish={() => navigateTo('chat')} />
+        )}
+        {view === 'chat' && (
+          <ChatPage onAddClick={() => navigateTo('device_discovery')} />
+        )}
+        {view === 'space' && (
+          <SpacePage onAddClick={() => navigateTo('space_extension')} />
+        )}
+        {view === 'space_extension' && (
+          <SpaceExtensionPage onBack={() => navigateTo('space')} />
+        )}
+        {view === 'account' && (
+          <SettingsPage
+            onManageDevice={() => navigateTo('device_discovery')}
+            onNavigateSubPage={navigateToSettingsSubPage}
+          />
+        )}
+        {view === 'device_discovery' && (
+          <DeviceDiscoveryPage
+            onBack={() => navigateTo(previousView === 'chat' ? 'chat' : 'account')}
+            onConnect={() => navigateTo('device_connection')}
+          />
+        )}
+        {view === 'device_connection' && (
+          <DeviceConnectionPage
+            onBack={() => navigateTo('device_discovery')}
+            onFinish={() => navigateTo('account')}
+          />
+        )}
+        {isSettingsSubView && renderSettingsSubPage()}
+      </AnimatePresence>
 
-      {/* Main Content */}
-      <main className="container px-4 py-6">
-        {/* Scan Section */}
-        <div className="mb-8">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Local Devices</h2>
-            <Button
-              onClick={handleScan}
-              disabled={isScanning}
-              variant="outline"
-              size="sm"
-            >
-              <Search className={`mr-2 h-4 w-4 ${isScanning ? 'animate-spin' : ''}`} />
-              {isScanning ? 'Scanning...' : 'Scan'}
-            </Button>
-          </div>
-
-          {/* Device List */}
-          <div className="space-y-3">
-            {devices.length === 0 ? (
-              <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-muted-foreground/30 bg-card/50 py-12">
-                <Wifi className="mb-3 h-10 w-10 text-muted-foreground/50" />
-                <p className="text-sm text-muted-foreground">
-                  No devices found
-                </p>
-                <p className="text-xs text-muted-foreground/70">
-                  Make sure your device is on the same network
-                </p>
-              </div>
-            ) : (
-              devices.map((device, index) => (
-                <div
-                  key={device}
-                  className="flex items-center justify-between rounded-lg border border-border bg-card p-4"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                      <MessageCircle className="h-5 w-5 text-muted-foreground" />
-                    </div>
-                    <div>
-                      <p className="font-medium">MoonHub Device {index + 1}</p>
-                      <p className="text-sm text-muted-foreground">{device}</p>
-                    </div>
-                  </div>
-                  <Button size="sm">Connect</Button>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="mb-8">
-          <h2 className="mb-4 text-lg font-semibold">Quick Actions</h2>
-          <div className="grid grid-cols-2 gap-3">
-            <Button variant="outline" className="h-auto flex-col gap-2 py-4">
-              <Settings className="h-5 w-5" />
-              <span className="text-sm">Settings</span>
-            </Button>
-            <Button variant="outline" className="h-auto flex-col gap-2 py-4">
-              <MessageCircle className="h-5 w-5" />
-              <span className="text-sm">Channels</span>
-            </Button>
-          </div>
-        </div>
-
-        {/* Install PWA Prompt */}
-        <div className="rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 p-6">
-          <h3 className="mb-2 font-semibold">Install MoonHub PWA</h3>
-          <p className="mb-4 text-sm text-muted-foreground">
-            Add MoonHub to your home screen for quick access to your devices.
-          </p>
-          <Button size="sm">Install App</Button>
-        </div>
-      </main>
+      {/* Bottom Navigation - only show on main views */}
+      {isMainView && (
+        <BottomNavBar current={view} onChange={(v) => navigateTo(v as ViewType)} />
+      )}
     </div>
   )
 }

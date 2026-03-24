@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;family=Noto+Sans+SC:wght@100;300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container-lowest": "#ffffff",
+              "surface-container-low": "#f1f4f6",
+              "on-primary-container": "#445362",
+              "tertiary-fixed-dim": "#d0d5dc",
+              "on-background": "#2b3437",
+              "on-error": "#fff7f6",
+              "inverse-surface": "#0c0f10",
+              "on-primary": "#f4f8ff",
+              "on-primary-fixed": "#31414f",
+              "surface-bright": "#f8f9fa",
+              "secondary": "#586066",
+              "on-secondary-fixed-variant": "#545d63",
+              "on-surface": "#2b3437",
+              "secondary-fixed-dim": "#cdd5dc",
+              "tertiary-fixed": "#dee3ea",
+              "surface": "#f8f9fa",
+              "on-tertiary-fixed-variant": "#565c62",
+              "tertiary-dim": "#4e5459",
+              "surface-tint": "#506070",
+              "outline": "#737c7f",
+              "surface-container-high": "#e3e9ec",
+              "on-secondary-fixed": "#384046",
+              "inverse-on-surface": "#9b9d9e",
+              "surface-variant": "#dbe4e7",
+              "on-tertiary-container": "#4d5258",
+              "surface-container-highest": "#dbe4e7",
+              "primary": "#506070",
+              "inverse-primary": "#daeafd",
+              "tertiary-container": "#dee3ea",
+              "on-error-container": "#752121",
+              "surface-dim": "#d1dce0",
+              "tertiary": "#5a6066",
+              "error-dim": "#4e0309",
+              "on-secondary-container": "#4b5359",
+              "on-secondary": "#f4f9ff",
+              "primary-dim": "#455463",
+              "primary-fixed-dim": "#c6d6e8",
+              "secondary-fixed": "#dce3eb",
+              "primary-fixed": "#d4e4f7",
+              "primary-container": "#d4e4f7",
+              "on-tertiary-fixed": "#3a4045",
+              "secondary-container": "#dce3eb",
+              "secondary-dim": "#4c545a",
+              "error": "#9f403d",
+              "background": "#f8f9fa",
+              "on-primary-fixed-variant": "#4e5d6d",
+              "on-tertiary": "#f6f9ff",
+              "on-surface-variant": "#586064",
+              "outline-variant": "#abb3b7",
+              "surface-container": "#eaeff1",
+              "error-container": "#fe8983"
+            },
+            fontFamily: {
+              "headline": ["Manrope", "Noto Sans SC"],
+              "body": ["Manrope", "Noto Sans SC"],
+              "label": ["Manrope", "Noto Sans SC"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Noto Sans SC', 'Manrope', sans-serif;
+            background-color: #f8f9fa; /* surface */
+        }
+        .halo-effect {
+            box-shadow: 0 0 80px 20px rgba(80, 96, 112, 0.05);
+        }
+        .glass-blur {
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.4);
+        }
+        .lunar-gradient {
+            background: radial-gradient(circle at center, #ffffff 0%, #f1f4f6 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface antialiased flex flex-col items-center justify-center min-h-screen overflow-hidden relative">
+<!-- Background Layer with Subtle Depth -->
+<div class="absolute inset-0 lunar-gradient z-0"></div>
+<!-- Ethereal Decorative Elements -->
+<div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary-fixed/20 blur-[120px]"></div>
+<div class="absolute bottom-[-5%] right-[-5%] w-[30%] h-[30%] rounded-full bg-secondary-container/30 blur-[100px]"></div>
+<!-- Main Branding Canvas -->
+<main class="relative z-10 flex flex-col items-center justify-center text-center">
+<!-- Minimalist Logo with Halo -->
+<div class="relative group mb-8">
+<!-- The Halo Glow -->
+<div class="absolute inset-0 rounded-full halo-effect scale-150 opacity-60"></div>
+<!-- Simplified Moon/Halo Icon -->
+<div class="relative flex items-center justify-center w-32 h-32 rounded-full bg-surface-container-lowest shadow-[0_8px_32px_rgba(80,96,112,0.08)] border border-surface-variant/30">
+<span class="material-symbols-outlined text-primary text-6xl font-light" style="font-variation-settings: 'wght' 200;">
+                    blur_on
+                </span>
+<!-- Inner Crescent Detail -->
+<div class="absolute inset-2 border-t-2 border-l-2 border-primary/20 rounded-full rotate-45"></div>
+</div>
+</div>
+<!-- Brand Name Typography -->
+<div class="space-y-4"><h1 class="text-5xl md:text-6xl font-light tracking-[0.5em] text-primary-dim uppercase font-headline leading-none">月 枢</h1>
+<div class="flex items-center justify-center space-x-4 opacity-40 mt-4">
+<div class="h-[1px] w-8 bg-outline-variant"></div>
+<span class="text-[10px] uppercase tracking-[0.3em] font-label font-medium text-on-surface-variant">
+                    Lunar Halo Essence
+                </span>
+<div class="h-[1px] w-8 bg-outline-variant"></div>
+</div></div>
+</main>
+<!-- Footer Identity (Discrete) -->
+<footer class="absolute bottom-12 w-full flex justify-center z-10">
+<div class="px-6 py-2 rounded-full bg-surface-container-low/40 border border-white/20 glass-blur">
+<p class="text-[11px] tracking-[0.2em] font-label text-on-surface-variant/60 uppercase">
+                Est. 2024 • Celestial Axis
+            </p>
+</div>
+</footer>
+</body></html>

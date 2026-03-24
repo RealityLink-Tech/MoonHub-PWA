@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700&amp;family=Noto+Sans+SC:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary": "#f6f9ff",
+              "on-error": "#fff7f6",
+              "error-container": "#fe8983",
+              "surface-variant": "#dbe4e7",
+              "secondary-fixed-dim": "#cdd5dc",
+              "surface-container-highest": "#dbe4e7",
+              "background": "#f8f9fa",
+              "error-dim": "#4e0309",
+              "surface-tint": "#506070",
+              "outline": "#737c7f",
+              "surface-bright": "#f8f9fa",
+              "surface": "#f8f9fa",
+              "error": "#9f403d",
+              "secondary": "#586066",
+              "surface-container-low": "#f1f4f6",
+              "inverse-on-surface": "#9b9d9e",
+              "on-background": "#2b3437",
+              "inverse-primary": "#daeafd",
+              "on-primary-fixed": "#31414f",
+              "on-primary-container": "#445362",
+              "secondary-dim": "#4c545a",
+              "on-tertiary-fixed": "#3a4045",
+              "on-surface-variant": "#586064",
+              "secondary-fixed": "#dce3eb",
+              "inverse-surface": "#0c0f10",
+              "on-surface": "#2b3437",
+              "primary-fixed": "#d4e4f7",
+              "surface-container-high": "#e3e9ec",
+              "on-secondary-fixed-variant": "#545d63",
+              "on-primary-fixed-variant": "#4e5d6d",
+              "on-secondary-container": "#4b5359",
+              "on-tertiary-fixed-variant": "#565c62",
+              "on-secondary": "#f4f9ff",
+              "on-tertiary-container": "#4d5258",
+              "tertiary-dim": "#4e5459",
+              "secondary-container": "#dce3eb",
+              "primary": "#506070",
+              "surface-dim": "#d1dce0",
+              "on-secondary-fixed": "#384046",
+              "tertiary-fixed-dim": "#d0d5dc",
+              "surface-container": "#eaeff1",
+              "primary-fixed-dim": "#c6d6e8",
+              "tertiary-fixed": "#dee3ea",
+              "on-primary": "#f4f8ff",
+              "tertiary-container": "#dee3ea",
+              "tertiary": "#5a6066",
+              "primary-dim": "#455463",
+              "primary-container": "#d4e4f7",
+              "on-error-container": "#752121",
+              "outline-variant": "#abb3b7"
+            },
+            fontFamily: {
+              "headline": ["Manrope", "Noto Sans SC"],
+              "body": ["Manrope", "Noto Sans SC"],
+              "label": ["Manrope", "Noto Sans SC"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .halo-pulse {
+            box-shadow: 0 0 0 0 rgba(176, 196, 222, 0.4);
+            animation: pulse 3s infinite cubic-bezier(0.4, 0, 0.6, 1);
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(176, 196, 222, 0.4); transform: scale(0.98); }
+            70% { box-shadow: 0 0 0 40px rgba(176, 196, 222, 0); transform: scale(1.02); }
+            100% { box-shadow: 0 0 0 0 rgba(176, 196, 222, 0); transform: scale(0.98); }
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary-container">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#f8f9fa]/80 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
+<div class="flex items-center justify-between px-6 h-16 w-full max-w-md mx-auto">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#d4e4f7]/30 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-[#506070]" data-icon="settings">settings</span>
+</button>
+<h1 class="font-['Manrope','PingFang_SC'] text-lg tracking-wider font-light text-[#506070]">设备发现</h1>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#d4e4f7]/30 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-[#506070]" data-icon="refresh">refresh</span>
+</button>
+</div>
+<div class="bg-gradient-to-b from-[#abb3b7]/10 to-transparent h-[1px]"></div>
+</header>
+<main class="pt-24 px-6 max-w-md mx-auto min-h-screen pb-12">
+<!-- Scanning Section: Halo Pulse -->
+<section class="flex flex-col items-center justify-center py-12 mb-8">
+<div class="relative flex items-center justify-center w-48 h-48">
+<!-- Inner Core -->
+<div class="absolute w-24 h-24 rounded-full bg-gradient-to-br from-primary-container to-surface-container-high halo-pulse flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="radar">radar</span>
+</div>
+<!-- Layered Halos (CSS only) -->
+<div class="absolute w-36 h-36 rounded-full border border-primary-container/30"></div>
+<div class="absolute w-48 h-48 rounded-full border border-primary-container/10"></div>
+</div>
+<div class="mt-10 text-center">
+<p class="text-on-surface-variant text-sm font-light tracking-[0.2em]">正在扫描局域网内设备...</p>
+<div class="flex justify-center gap-1 mt-3">
+<span class="w-1 h-1 rounded-full bg-primary/40"></span>
+<span class="w-1 h-1 rounded-full bg-primary/20"></span>
+<span class="w-1 h-1 rounded-full bg-primary/10"></span>
+</div>
+</div>
+</section>
+<!-- Device List Section -->
+<section class="space-y-4">
+<div class="flex items-center justify-between px-2 mb-2">
+<h2 class="text-sm font-medium text-primary tracking-wide">已发现设备 (2)</h2>
+<span class="text-[10px] text-outline-variant uppercase tracking-tighter">Nearby Devices</span>
+</div>
+<!-- Card 01 -->
+<div class="group relative overflow-hidden p-5 rounded-xl bg-surface-container-low transition-all duration-300 hover:bg-surface-container-lowest hover:shadow-[0_12px_40px_rgba(80,96,112,0.06)] flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center text-primary transition-colors group-hover:bg-primary-container">
+<span class="material-symbols-outlined" data-icon="router">router</span>
+</div>
+<div class="flex-1">
+<h3 class="text-on-surface font-medium text-[15px]">月枢智能盒 01</h3>
+<p class="text-outline text-xs mt-1 font-mono tracking-tight">192.168.1.105</p>
+</div>
+<button class="w-8 h-8 rounded-full flex items-center justify-center text-outline-variant hover:text-primary hover:bg-primary-container/30 transition-all">
+<span class="material-symbols-outlined text-[20px]" data-icon="add_circle">add_circle</span>
+</button>
+</div>
+<!-- Card 02 -->
+<div class="group relative overflow-hidden p-5 rounded-xl bg-surface-container-low transition-all duration-300 hover:bg-surface-container-lowest hover:shadow-[0_12px_40_rgba(80,96,112,0.06)] flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center text-primary transition-colors group-hover:bg-primary-container">
+<span class="material-symbols-outlined" data-icon="nest_cam_iq">nest_cam_iq</span>
+</div>
+<div class="flex-1">
+<h3 class="text-on-surface font-medium text-[15px]">月枢监控终端-北</h3>
+<p class="text-outline text-xs mt-1 font-mono tracking-tight">192.168.1.112</p>
+</div>
+<button class="w-8 h-8 rounded-full flex items-center justify-center text-outline-variant hover:text-primary hover:bg-primary-container/30 transition-all">
+<span class="material-symbols-outlined text-[20px]" data-icon="add_circle">add_circle</span>
+</button>
+</div>
+<!-- Manual Add Link -->
+<div class="pt-6 flex justify-center">
+<a class="text-xs text-primary/70 hover:text-primary transition-colors font-light tracking-widest border-b border-primary/20 pb-0.5" href="#">
+                    手动输入IP添加设备
+                </a>
+</div>
+</section>
+<!-- Empty State (Hidden by default or shown if list empty) -->
+<section class="hidden flex flex-col items-center justify-center py-20 text-center">
+<div class="w-20 h-20 rounded-full bg-surface-container flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-outline-variant text-4xl" data-icon="cloud_off">cloud_off</span>
+</div>
+<p class="text-on-surface-variant font-light text-sm">暂未发现可用设备</p>
+<button class="mt-8 px-8 py-2.5 rounded-full border border-outline-variant/30 text-primary text-xs tracking-widest hover:bg-primary-container/20 transition-all">
+                重新扫描
+            </button>
+</section>
+</main>
+<!-- BottomNavBar -->
+<!-- FAB for quick refresh (Optional overlay) -->
+</body></html>

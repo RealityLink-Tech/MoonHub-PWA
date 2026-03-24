@@ -16,8 +16,8 @@ export default defineConfig({
         name: 'MoonHub',
         short_name: 'MoonHub',
         description: 'MoonHub - Personal AI Assistant Control Panel',
-        theme_color: '#0f172a',
-        background_color: '#0f172a',
+        theme_color: '#f8f9fa',
+        background_color: '#f8f9fa',
         display: 'standalone',
         orientation: 'portrait',
         scope: '/',
@@ -46,15 +46,8 @@ export default defineConfig({
         runtimeCaching: [
           {
             urlPattern: /^http:\/\/\d+\.\d+\.\d+\.\d+:\d+\/api/,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'api-cache',
-              expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 // 24 hours
-              }
-            }
-          }
+            handler: 'NetworkOnly',
+          },
         ]
       }
     })
