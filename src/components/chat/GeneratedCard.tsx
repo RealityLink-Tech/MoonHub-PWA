@@ -24,7 +24,7 @@ const hasValue = (value: unknown): boolean => {
 }
 
 // Card type renderers
-const cardRenderers: Record<string, (data: Record<string, unknown>) => ReactNode> = {
+const cardRenderers: Record<string, (_data: Record<string, unknown>) => ReactNode> = {
   // Weather card
   weather: (data) => {
     const forecast = data.forecast as Array<{ day: string; temp: string; icon: string }> | undefined

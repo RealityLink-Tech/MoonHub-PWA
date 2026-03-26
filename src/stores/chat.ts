@@ -25,16 +25,16 @@ interface ChatState {
 
   // Actions
   loadConversations: () => Promise<void>
-  createConversation: (deviceId: string, title?: string) => Promise<Conversation>
-  deleteConversation: (conversationId: string) => Promise<void>
-  setCurrentConversation: (conversationId: string | null) => void
+  createConversation: (_deviceId: string, _title?: string) => Promise<Conversation>
+  deleteConversation: (_conversationId: string) => Promise<void>
+  setCurrentConversation: (_conversationId: string | null) => void
 
-  loadMessages: (conversationId: string) => Promise<void>
-  addMessage: (message: Omit<Message, 'id' | 'timestamp'>) => Promise<Message>
-  updateMessage: (messageId: string, content: Partial<Message>) => Promise<void>
+  loadMessages: (_conversationId: string) => Promise<void>
+  addMessage: (_message: Omit<Message, 'id' | 'timestamp'>) => Promise<Message>
+  updateMessage: (_messageId: string, _content: Partial<Message>) => Promise<void>
 
-  setStreaming: (streaming: boolean, content?: string) => void
-  setTyping: (typing: boolean) => void
+  setStreaming: (_streaming: boolean, _content?: string) => void
+  setTyping: (_typing: boolean) => void
 
   // Helper
   getCurrentConversation: () => Conversation | undefined

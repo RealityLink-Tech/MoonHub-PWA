@@ -181,23 +181,28 @@ function ChatView() {
 
 ### useVoice
 
-Speech recognition and synthesis.
+Wraps `VoiceService`: Web Speech **recognition** (listen / transcript), **synthesis** (`speak`), plus optional **MediaRecorder** helpers for raw audio blobs.
 
 **File**: `src/hooks/useVoice.ts`
 
 ```typescript
 import { useVoice } from '@/hooks'
 
-function VoiceInput() {
+function VoiceBar() {
   const {
-    isRecording,
-    isPlaying,
-    transcription,
+    isListening,
+    isSpeaking,
+    transcript,
+    interimTranscript,
     error,
-    startRecording,
-    stopRecording,
+    isRecognitionSupported,
+    startListening,
+    stopListening,
+    toggleListening,
     speak,
     stopSpeaking,
+    startRecording,
+    stopRecording,
   } = useVoice()
 
   return (/* ... */)
@@ -208,39 +213,30 @@ function VoiceInput() {
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `isRecording` | `boolean` | Recording flag |
-| `isPlaying` | `boolean` | Playing flag |
-| `transcription` | `string` | Last transcription |
-| `error` | `string \| null` | Error message |
-| `startRecording` | `() => Promise<void>` | Start recording |
-| `stopRecording` | `() => Promise<TranscriptionResult>` | Stop and get result |
-| `speak` | `(text: string) => Promise<void>` | Text-to-speech |
-| `stopSpeaking` | `() => void` | Stop playback |
+| `isListening` | `boolean` | Recognition active |
+| `isSpeaking` | `boolean` | TTS active |
+| `transcript` | `string` | Last final recognition text |
+| `interimTranscript` | `string` | In-progress recognition text |
+| `error` | `string \| null` | Last error message |
+| `isRecognitionSupported` / `isSynthesisSupported` | `boolean` | Browser support flags |
+| `startListening` / `stopListening` / `toggleListening` | functions | Control recognition |
+| `speak` / `stopSpeaking` | functions | TTS |
+| `startRecording` | `() => Promise<boolean>` | Start `MediaRecorder` |
+| `stopRecording` | `() => Promise<Blob \| null>` | Stop and get audio blob |
+| `getVoices` / `blobToBase64` | functions | Voice list and encoding helper |
 
 #### Usage Examples
 
 ```typescript
 function VoiceButton() {
-  const {
-    isRecording,
-    transcription,
-    startRecording,
-    stopRecording,
-  } = useVoice()
-
-  const handleClick = async () => {
-    if (isRecording) {
-      const result = await stopRecording()
-      console.log('Transcription:', result.transcription)
-    } else {
-      await startRecording()
-    }
-  }
+  const { isListening, transcript, toggleListening, speak } = useVoice()
 
   return (
-    <button onClick={handleClick}>
-      {isRecording ? 'Stop' : 'Record'}
-    </button>
+    <div>
+      <button onClick={toggleListening}>{isListening ? 'Stop' : 'Listen'}</button>
+      {transcript && <p>{transcript}</p>}
+      <button onClick={() => speak(transcript)}>Read aloud</button>
+    </div>
   )
 }
 ```
@@ -354,33 +350,35 @@ function OfflineIndicator() {
 
 ### useAIUpdate
 
-AI model update detection.
+Reserved hook for **per-component AI push updates** (WebSocket or SSE later). Currently logs placeholders and exposes a manual `requestUpdate` callback.
 
 **File**: `src/hooks/useAIUpdate.ts`
 
 ```typescript
 import { useAIUpdate } from '@/hooks'
 
-function AIUpdateStatus() {
-  const {
-    hasUpdate,
-    updateInfo,
-    checkUpdate,
-    applyUpdate,
-  } = useAIUpdate()
+function SpaceWidget({ componentId }: { componentId: string }) {
+  const { requestUpdate } = useAIUpdate(componentId, (data) => {
+    // Reserved: handle pushed payload
+    console.log('update', data)
+  })
 
-  return (/* ... */)
+  return <button onClick={requestUpdate}>Refresh from AI</button>
 }
 ```
+
+#### Parameters
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `componentId` | `string` | Component instance id for future subscription scope |
+| `onUpdate` | `(data: unknown) => void` | Reserved push handler (not wired yet) |
 
 #### Return Values
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `hasUpdate` | `boolean` | Update available |
-| `updateInfo` | `UpdateInfo \| null` | Update details |
-| `checkUpdate` | `() => Promise<void>` | Check for updates |
-| `applyUpdate` | `() => Promise<void>` | Apply update |
+| `requestUpdate` | `() => void` | Reserved manual refresh trigger |
 
 ## Usage Patterns
 
@@ -436,24 +434,22 @@ function DeviceStatus() {
 import { useVoice, useChat } from '@/hooks'
 
 function VoiceChat() {
-  const { isRecording, startRecording, stopRecording } = useVoice()
+  const { isListening, transcript, toggleListening } = useVoice()
   const { sendMessage } = useChat()
 
-  const handleVoiceInput = async () => {
-    if (isRecording) {
-      const result = await stopRecording()
-      if (result.transcription) {
-        await sendMessage(result.transcription)
-      }
-    } else {
-      await startRecording()
-    }
+  const handleSendTranscript = async () => {
+    if (transcript) await sendMessage(transcript)
   }
 
   return (
-    <button onClick={handleVoiceInput}>
-      {isRecording ? '🎤 Recording...' : '🎤 Tap to speak'}
-    </button>
+    <div>
+      <button onClick={toggleListening}>
+        {isListening ? '🎤 Listening…' : '🎤 Tap to speak'}
+      </button>
+      <button onClick={handleSendTranscript} disabled={!transcript}>
+        Send transcript
+      </button>
+    </div>
   )
 }
 ```

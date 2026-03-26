@@ -34,7 +34,7 @@ export function ChatPage({ onAddClick }: { onAddClick: () => void }) {
   const imageInputRef = useRef<HTMLInputElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  const { messages, addMessage, isTyping, setTyping } = useChatStore()
+  const { messages, isTyping, setTyping } = useChatStore()
 
   // Local messages state for demo (since store may be empty)
   const [localMessages, setLocalMessages] = useState<Message[]>([])

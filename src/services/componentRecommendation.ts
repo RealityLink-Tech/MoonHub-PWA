@@ -21,7 +21,7 @@ export interface ComponentRecommendationResult {
 export const componentRecommendation = {
   // 获取 AI 推荐的组件列表
   getRecommendations: async (context?: string): Promise<ComponentRecommendationResult> => {
-    console.log('[预留] Get AI component recommendations, context:', context)
+    console.warn('[预留] Get AI component recommendations, context:', context)
     // 返回 mock 数据，后续对接 API
     return {
       components: [
@@ -67,13 +67,13 @@ export const componentRecommendation = {
 
   // 添加组件到空间
   addComponent: async (spaceId: string, componentType: string): Promise<{ success: boolean }> => {
-    console.log('[预留] Add component to space:', spaceId, componentType)
+    console.warn('[预留] Add component to space:', spaceId, componentType)
     return { success: true }
   },
 
   // 移除组件
   removeComponent: async (spaceId: string, componentId: string): Promise<{ success: boolean }> => {
-    console.log('[预留] Remove component from space:', spaceId, componentId)
+    console.warn('[预留] Remove component from space:', spaceId, componentId)
     return { success: true }
   },
 
@@ -83,7 +83,7 @@ export const componentRecommendation = {
     componentId: string,
     config: Record<string, unknown>
   ): Promise<{ success: boolean }> => {
-    console.log('[预留] Update component config:', spaceId, componentId, config)
+    console.warn('[预留] Update component config:', spaceId, componentId, config)
     return { success: true }
   },
 }

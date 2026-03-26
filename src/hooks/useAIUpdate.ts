@@ -11,21 +11,21 @@ import { useEffect, useCallback } from 'react'
  */
 export function useAIUpdate(
   componentId: string,
-  onUpdate: (data: unknown) => void
+  _onUpdate: (_data: unknown) => void
 ) {
   useEffect(() => {
     // 预留：订阅 AI 推送
-    console.log('[预留] Subscribe to AI updates for component:', componentId)
+    console.warn('[预留] Subscribe to AI updates for component:', componentId)
 
     // 预留：清理订阅
     return () => {
-      console.log('[预留] Unsubscribe from AI updates for component:', componentId)
+      console.warn('[预留] Unsubscribe from AI updates for component:', componentId)
     }
   }, [componentId])
 
   // 预留：手动触发更新请求
   const requestUpdate = useCallback(() => {
-    console.log('[预留] Request AI update for component:', componentId)
+    console.warn('[预留] Request AI update for component:', componentId)
   }, [componentId])
 
   return { requestUpdate }

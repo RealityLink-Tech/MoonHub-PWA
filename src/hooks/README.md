@@ -135,38 +135,32 @@ function ChatPage() {
 
 ### useVoice
 
-语音输入和输出。
+语音识别（Web Speech）、语音合成，以及可选的 `MediaRecorder` 原始音频采集。
 
 ```typescript
 import { useVoice } from '@/hooks'
 
 function VoiceInput() {
   const {
-    // 状态
-    isRecording,         // 录音中
-    isPlaying,           // 播放中
-    transcription,       // 转录文本
-    error,               // 错误信息
-
-    // 操作
-    startRecording,      // 开始录音
-    stopRecording,       // 停止录音
-    speak,               // 语音合成
-    stopSpeaking,        // 停止播放
+    isListening,
+    isSpeaking,
+    transcript,
+    interimTranscript,
+    error,
+    isRecognitionSupported,
+    startListening,
+    stopListening,
+    toggleListening,
+    speak,
+    stopSpeaking,
+    startRecording,
+    stopRecording,
+    getVoices,
+    blobToBase64,
   } = useVoice()
 
-  const handleRecord = async () => {
-    if (isRecording) {
-      const result = await stopRecording()
-      console.log('转录:', result.transcription)
-    } else {
-      await startRecording()
-    }
-  }
-
-  return (
-    // ...
-  )
+  // toggleListening：开关识别；transcript：最终结果；interimTranscript：中间结果
+  // startRecording / stopRecording：WebM 音频 Blob（非 Web Speech 转写）
 }
 ```
 
@@ -223,22 +217,17 @@ function PWAStatus() {
 
 ### useAIUpdate
 
-AI 更新检测。
+AI 推送更新（预留）：按组件 id 订阅，后续对接 WebSocket/SSE。当前仅占位日志与 `requestUpdate`。
 
 ```typescript
 import { useAIUpdate } from '@/hooks'
 
-function AIUpdateStatus() {
-  const {
-    hasUpdate,           // 有更新
-    updateInfo,          // 更新信息
-    checkUpdate,         // 检查更新
-    applyUpdate,         // 应用更新
-  } = useAIUpdate()
+function SpaceWidget({ componentId }: { componentId: string }) {
+  const { requestUpdate } = useAIUpdate(componentId, (data) => {
+    console.log('push', data)
+  })
 
-  return (
-    // ...
-  )
+  return <button onClick={requestUpdate}>向 AI 请求更新</button>
 }
 ```
 

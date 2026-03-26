@@ -63,7 +63,7 @@ export function DeviceConnectionPage({
     }
 
     // Mock connection success
-    console.log('Connecting with code:', fullCode)
+    console.warn('Connecting with code:', fullCode)
     onFinish()
   }
 

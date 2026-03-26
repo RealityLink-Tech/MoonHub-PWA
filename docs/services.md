@@ -37,13 +37,22 @@ const currentClient = getClient()
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `ping()` | `GET /api/ping` | Device online check |
-| `getDeviceStatus()` | `GET /api/status` | Device status info |
-| `pair(authCode)` | `POST /api/pair` | Pair with auth code |
-| `verifyToken()` | `GET /api/verify` | Validate current token |
+| `getDeviceStatus()` | `GET /api/system/info` | System / device info |
+| `pair(authCode)` | `POST /api/auth/pair` | Pair with auth code |
+| `verifyToken()` | `GET /api/auth/verify` | Validate current token |
 | `chat(request)` | `POST /api/chat` | Synchronous chat |
-| `chatStream(request)` | `POST /api/chat` | Streaming chat |
+| `chatStream(request)` | `POST /api/chat/stream` | Streaming chat (SSE-style lines) |
+| `generateSpace(request)` | `POST /api/space/generate` | Generate Space layout |
+| `getSpace(spaceId)` | `GET /api/space/:id` | Fetch Space by id |
+| `getGatewayStatus()` | `GET /api/gateway/status` | Gateway status |
+| `startGateway()` / `stopGateway()` | `POST /api/gateway/start` · `POST /api/gateway/stop` | Control gateway |
+| `subscribeToGatewayEvents(onEvent, onError?)` | `GET /api/gateway/events` (SSE via `EventSource`) | Live gateway events; returns unsubscribe |
 | `getConfig()` | `GET /api/config` | Get device config |
 | `updateConfig(config)` | `PUT /api/config` | Update device config |
+| `getSkills()` | `GET /api/skills` | List skills |
+| `installSkill(skillUrl)` | `POST /api/skills` | Install skill from URL |
+| `getModels()` | `GET /api/models` | List models |
+| `setDefaultModel(modelId)` | `POST /api/models/default` | Set default model |
 
 #### Usage Examples
 
@@ -221,29 +230,56 @@ const voice = getVoice()
 
 | Method | Description |
 |--------|-------------|
-| `startRecording()` | Start speech recognition |
-| `stopRecording()` | Stop and get result |
-| `speak(text)` | Text-to-speech |
-| `stopSpeaking()` | Stop playback |
-| `isSupported()` | Check browser support |
+| `isRecognitionSupported()` / `isSynthesisSupported()` | Browser capability checks |
+| `startRecognition(options)` / `stopRecognition()` | Web Speech recognition with callbacks |
+| `speak(text, options?)` / `stopSpeaking()` | TTS |
+| `pauseSpeaking()` / `resumeSpeaking()` / `isSpeaking()` | Playback control |
+| `getVoices()` | Available synthesis voices |
+| `startAudioRecording()` / `recordAudio(maxDuration?)` | `MediaRecorder` helpers |
+| `blobToBase64(blob)` | Encode audio for upload |
 
 #### Usage Examples
 
 ```typescript
-// Check support
-if (!voice.isSupported()) {
-  console.log('Speech not supported')
+if (!voice.isRecognitionSupported()) {
+  console.log('Recognition not supported')
 }
 
-// Record and transcribe
-await voice.startRecording()
-// ... user speaks ...
-const result = await voice.stopRecording()
-console.log('Transcription:', result.transcription)
+voice.startRecognition({
+  language: 'zh-CN',
+  interimResults: true,
+  onResult: (text, isFinal) => console.log(text, isFinal),
+  onError: (msg) => console.error(msg),
+})
+// … later …
+voice.stopRecognition()
 
-// Text-to-speech
-await voice.speak('Hello, world!')
+voice.speak('Hello', { onEnd: () => console.log('done') })
 ```
+
+### componentRecommendation (Space)
+
+Stub service for the Space “add component” flow: returns mock recommendations until a backend API exists.
+
+**File**: `src/services/componentRecommendation.ts`
+
+```typescript
+import { componentRecommendation } from '@/services/componentRecommendation'
+
+const { components } = await componentRecommendation.getRecommendations('optional context')
+await componentRecommendation.addComponent(spaceId, 'weather')
+```
+
+| Member | Description |
+|--------|-------------|
+| `getRecommendations(context?)` | Returns `RecommendedComponent[]` (mock) |
+| `addComponent(spaceId, type)` | Placeholder success |
+| `removeComponent(spaceId, componentId)` | Placeholder success |
+| `updateComponentConfig(spaceId, componentId, config)` | Placeholder success |
+
+### Mock service (`mock.ts`)
+
+Development / demo helpers. Import from `@/services/mock` when used in the app.
 
 ## Response Format
 
@@ -281,11 +317,11 @@ console.log('Token:', result.data?.token)
 All services use singleton pattern:
 
 ```typescript
-// Get singleton instances
 const client = getClient()
 const discovery = getDiscovery()
 const storage = getStorage()
 const voice = getVoice()
+// componentRecommendation is a plain object export (not a getXxx singleton)
 ```
 
 ## Related Documentation

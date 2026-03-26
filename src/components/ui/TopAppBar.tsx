@@ -3,7 +3,7 @@
 // 玻璃态顶部导航栏
 // ============================================================
 
-import type { ReactNode, ComponentType } from 'react'
+import type { ReactNode } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { ArrowLeft } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'

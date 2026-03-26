@@ -21,18 +21,18 @@ interface SpaceState {
   currentComponents: GeneratedComponent[]
 
   // Actions
-  loadSpaces: (deviceId: string) => Promise<void>
-  createSpace: (deviceId: string, name: string, components: GeneratedComponent[]) => Promise<Space>
-  updateSpace: (spaceId: string, updates: Partial<Space>) => Promise<void>
-  deleteSpace: (spaceId: string) => Promise<void>
-  setCurrentSpace: (spaceId: string | null) => void
+  loadSpaces: (_deviceId: string) => Promise<void>
+  createSpace: (_deviceId: string, _name: string, _components: GeneratedComponent[]) => Promise<Space>
+  updateSpace: (_spaceId: string, _updates: Partial<Space>) => Promise<void>
+  deleteSpace: (_spaceId: string) => Promise<void>
+  setCurrentSpace: (_spaceId: string | null) => void
 
-  setGenerating: (generating: boolean, progress?: string) => void
-  setComponents: (components: GeneratedComponent[]) => void
+  setGenerating: (_generating: boolean, _progress?: string) => void
+  setComponents: (_components: GeneratedComponent[]) => void
 
   // Component interaction
-  addComponent: (component: Omit<GeneratedComponent, 'id'>) => void
-  updateComponent: (componentId: string, props: Record<string, unknown>) => void
+  addComponent: (_component: Omit<GeneratedComponent, 'id'>) => void
+  updateComponent: (_componentId: string, _props: Record<string, unknown>) => void
 }
 
 export const useSpaceStore = create<SpaceState>((set, get) => ({

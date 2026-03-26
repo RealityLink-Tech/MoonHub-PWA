@@ -271,17 +271,17 @@ export class MoonHubClient {
 
   // Gateway events via SSE
   subscribeToGatewayEvents(
-    onEvent: (event: unknown) => void,
-    onError?: (error: Error) => void
+    onEvent: (_event: unknown) => void,
+    onError?: (_error: Error) => void
   ): () => void {
     const url = `${this.baseUrl}/api/gateway/events`
     const eventSource = new EventSource(url)
 
-    eventSource.onmessage = (event) => {
+    eventSource.onmessage = (_event) => {
       try {
-        onEvent(JSON.parse(event.data))
+        onEvent(JSON.parse(_event.data))
       } catch {
-        onEvent(event.data)
+        onEvent(_event.data)
       }
     }
 

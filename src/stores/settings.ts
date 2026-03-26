@@ -10,11 +10,11 @@ import { DEFAULT_SETTINGS } from '@/services/storage'
 
 interface SettingsState extends AppSettings {
   // Actions
-  setTheme: (theme: AppSettings['theme']) => void
-  setLanguage: (language: string) => void
-  setNotifications: (notifications: Partial<AppSettings['notifications']>) => void
-  setVoice: (voice: Partial<AppSettings['voice']>) => void
-  setNetwork: (network: Partial<AppSettings['network']>) => void
+  setTheme: (_theme: AppSettings['theme']) => void
+  setLanguage: (_language: string) => void
+  setNotifications: (_notifications: Partial<AppSettings['notifications']>) => void
+  setVoice: (_voice: Partial<AppSettings['voice']>) => void
+  setNetwork: (_network: Partial<AppSettings['network']>) => void
   reset: () => void
 }
 

@@ -6,15 +6,15 @@ interface SpeechRecognitionEvent extends Event {
 
 interface SpeechRecognitionResultList {
   length: number
-  item(index: number): SpeechRecognitionResult
-  [index: number]: SpeechRecognitionResult
+  item(_index: number): SpeechRecognitionResult
+  [_index: number]: SpeechRecognitionResult
 }
 
 interface SpeechRecognitionResult {
   length: number
   isFinal: boolean
-  item(index: number): SpeechRecognitionAlternative
-  [index: number]: SpeechRecognitionAlternative
+  item(_index: number): SpeechRecognitionAlternative
+  [_index: number]: SpeechRecognitionAlternative
 }
 
 interface SpeechRecognitionAlternative {

@@ -13,7 +13,7 @@ interface HeaderProps {
   showAdd?: boolean
   onAddClick?: () => void
   onSearchClick?: () => void
-  onSearch?: (query: string) => void
+  onSearch?: (_query: string) => void
   className?: string
 }
 
@@ -48,7 +48,7 @@ export function Header({
     e.preventDefault()
     if (searchQuery.trim()) {
       onSearch?.(searchQuery.trim())
-      console.log('Searching:', searchQuery)
+      console.warn('Searching:', searchQuery)
     }
   }
 

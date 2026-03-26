@@ -19,12 +19,12 @@ interface UIState {
   toast: { message: string; type: 'success' | 'error' | 'info' } | null
 
   // Actions
-  setActiveTab: (tab: UIState['activeTab']) => void
-  showPairing: (deviceAddress?: string) => void
+  setActiveTab: (_tab: UIState['activeTab']) => void
+  showPairing: (_deviceAddress?: string) => void
   hidePairing: () => void
-  setShowInstallPrompt: (show: boolean) => void
-  setShowDeviceList: (show: boolean) => void
-  showToast: (message: string, type?: 'success' | 'error' | 'info') => void
+  setShowInstallPrompt: (_show: boolean) => void
+  setShowDeviceList: (_show: boolean) => void
+  showToast: (_message: string, _type?: 'success' | 'error' | 'info') => void
   hideToast: () => void
 }
 

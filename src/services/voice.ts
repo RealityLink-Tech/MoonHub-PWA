@@ -7,8 +7,8 @@ export interface VoiceRecognitionOptions {
   continuous?: boolean
   interimResults?: boolean
   language?: string
-  onResult?: (transcript: string, isFinal: boolean) => void
-  onError?: (error: string) => void
+  onResult?: (_transcript: string, _isFinal: boolean) => void
+  onError?: (_error: string) => void
   onEnd?: () => void
 }
 
@@ -19,7 +19,7 @@ export interface VoiceSynthesisOptions {
   voice?: SpeechSynthesisVoice
   onStart?: () => void
   onEnd?: () => void
-  onError?: (error: string) => void
+  onError?: (_error: string) => void
 }
 
 export class VoiceService {

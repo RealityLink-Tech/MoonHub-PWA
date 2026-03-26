@@ -7,7 +7,6 @@ import {
   createRouter,
   createRootRoute,
   createRoute,
-  Outlet,
 } from '@tanstack/react-router'
 import { App } from '@/App'
 

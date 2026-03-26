@@ -12,6 +12,7 @@ PWA service layer for API communication, device discovery, storage, and hardware
 - **storage.ts** - IndexedDB 存储服务
 - **voice.ts** - 语音服务
 - **mock.ts** - 模拟数据服务
+- **componentRecommendation.ts** - Space 组件推荐（当前为预留 / Mock）
 
 ## 文件结构
 
@@ -152,22 +153,20 @@ await storage.clear()
 
 ### VoiceService (`voice.ts`)
 
-语音输入/输出服务。
+语音识别（`startRecognition` / `stopRecognition`）、合成（`speak` / `stopSpeaking`）、以及 `MediaRecorder` 辅助方法。
 
 ```typescript
-import { VoiceService, getVoice } from '@/services/voice'
+import { getVoice } from '@/services/voice'
 
 const voice = getVoice()
 
-// 开始录音
-await voice.startRecording()
+voice.startRecognition({
+  language: 'zh-CN',
+  onResult: (text, isFinal) => console.log(text, isFinal),
+})
+voice.stopRecognition()
 
-// 停止录音并获取结果
-const result = await voice.stopRecording()
-console.log('Transcription:', result.transcription)
-
-// 播放音频
-await voice.speak('Hello, world!')
+voice.speak('Hello, world!')
 ```
 
 ## 单例模式

@@ -176,7 +176,7 @@ export interface StreamChunk {
   data?: unknown
 }
 
-export type StreamCallback = (chunk: StreamChunk) => void
+export type StreamCallback = (_chunk: StreamChunk) => void
 
 // ==================== Settings Types ====================
 

@@ -5,7 +5,7 @@
 
 import { useState } from 'react'
 import { motion } from 'motion/react'
-import { ArrowLeft, Monitor, Smartphone, Laptop, Wifi, WifiOff, Check, X, ChevronRight, ToggleLeft, ToggleRight } from 'lucide-react'
+import { ArrowLeft, Monitor, Smartphone, Laptop, Wifi, WifiOff, Check } from 'lucide-react'
 import {
   mockConnectedDevices,
   mockModelConfigs,

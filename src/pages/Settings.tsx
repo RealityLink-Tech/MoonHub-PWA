@@ -26,7 +26,7 @@ export function SettingsPage({
   onNavigateSubPage,
 }: {
   onManageDevice: () => void
-  onNavigateSubPage?: (page: SettingsSubPage) => void
+  onNavigateSubPage?: (_page: SettingsSubPage) => void
 }) {
   const handlePreferenceClick = (id: string) => {
     onNavigateSubPage?.(id as SettingsSubPage)
@@ -95,7 +95,7 @@ export function SettingsPage({
         <section className="space-y-4">
           <h3 className="text-sm font-bold text-on-surface-variant/60 uppercase tracking-[0.2em] px-2">系统偏好</h3>
           <div className="bg-surface-container-low rounded-[32px] overflow-hidden border border-outline-variant/10">
-            {mockSystemPreferences.map((item, i) => {
+            {mockSystemPreferences.map((item, _i) => {
               const Icon = {
                 Smartphone,
                 Cpu,

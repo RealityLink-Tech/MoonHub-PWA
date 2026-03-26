@@ -14,6 +14,7 @@ MoonHub PWA 是一个渐进式 Web 应用，用于与 MoonHub AI 助手设备进
 - **Zustand** - 状态管理
 - **vite-plugin-pwa** - PWA 支持
 - **Lucide React** - 图标
+- **Motion** - 动画
 
 ## 核心功能
 
@@ -56,22 +57,30 @@ src/
 │   │   ├── button.tsx
 │   │   └── toast.tsx
 │   └── Layout.tsx      # 主布局
-├── hooks/              # 自定义 Hooks
-│   ├── useChat.ts      # 聊天逻辑
-│   ├── useDevice.ts    # 设备管理
-│   ├── usePWA.ts       # PWA 功能
-│   ├── useTheme.ts     # 主题管理
-│   └── useVoice.ts     # 语音功能
+├── hooks/              # 自定义 Hooks（`index.ts` 统一导出）
+│   ├── useChat.ts
+│   ├── useDevice.ts
+│   ├── usePWA.ts
+│   ├── useTheme.ts
+│   ├── useVoice.ts
+│   └── useAIUpdate.ts  # AI 推送预留
+├── lib/
+│   └── utils.ts        # 通用工具
 ├── pages/              # 页面组件
-│   ├── Chat.tsx        # 对话页面
-│   ├── Pair.tsx        # 配对页面
-│   ├── Settings.tsx    # 设置页面
-│   └── Space.tsx       # Space 页面
-├── services/           # 服务层
-│   ├── device.ts       # API 客户端
-│   ├── discovery.ts    # 设备发现
-│   ├── storage.ts      # IndexedDB 存储
-│   └── voice.ts        # 语音服务
+│   ├── Splash.tsx
+│   ├── DeviceDiscovery.tsx
+│   ├── DeviceConnection.tsx
+│   ├── Pair.tsx
+│   ├── Chat.tsx
+│   ├── Space.tsx
+│   └── Settings.tsx
+├── services/           # 服务层（按文件直接 import，无 `index.ts`）
+│   ├── device.ts
+│   ├── discovery.ts
+│   ├── storage.ts
+│   ├── voice.ts
+│   ├── mock.ts
+│   └── componentRecommendation.ts
 ├── stores/             # Zustand 状态管理
 │   ├── chat.ts         # 聊天状态
 │   ├── device.ts       # 设备状态
@@ -81,10 +90,11 @@ src/
 ├── types/              # TypeScript 类型定义
 │   ├── index.ts        # 核心类型
 │   └── api.ts          # API 类型
-├── App.tsx             # 根组件
-├── main.tsx            # 入口文件
-├── router.tsx          # 路由配置
-└── index.css           # 全局样式
+├── App.tsx
+├── AppInitializer.tsx
+├── main.tsx
+├── router.tsx
+└── index.css
 ```
 
 ## API 通信
@@ -92,17 +102,24 @@ src/
 ### 基础 API 端点
 
 ```
-GET  /api/ping              # 设备发现
-POST /api/auth/pair         # 配对授权
-POST /api/auth/verify       # Token 验证
-POST /api/chat              # 发送消息
-POST /api/chat/stream       # 流式消息
-POST /api/space/generate    # 生成 Space
-GET  /api/space/:id         # 获取 Space
-GET  /api/config            # 获取配置
-PUT  /api/config            # 更新配置
-GET  /api/gateway/status    # 网关状态
-GET  /api/gateway/events    # SSE 事件流
+GET  /api/ping                 # 在线检测
+GET  /api/system/info          # 系统信息
+POST /api/auth/pair            # 配对
+GET  /api/auth/verify          # Token 校验
+POST /api/chat                 # 同步对话
+POST /api/chat/stream          # 流式对话
+POST /api/space/generate       # 生成 Space
+GET  /api/space/:id            # 获取 Space
+GET  /api/config               # 配置
+PUT  /api/config               # 更新配置
+GET  /api/gateway/status       # 网关状态
+POST /api/gateway/start        # 启动网关
+POST /api/gateway/stop         # 停止网关
+GET  /api/gateway/events       # SSE（客户端用 EventSource）
+GET  /api/skills               # 技能列表
+POST /api/skills               # 安装技能
+GET  /api/models               # 模型列表
+POST /api/models/default       # 默认模型
 ```
 
 ## 状态管理

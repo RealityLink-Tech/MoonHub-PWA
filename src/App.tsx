@@ -3,7 +3,7 @@
 // 主应用 - 使用简单的视图导航与参考项目一致
 // ============================================================
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { AnimatePresence } from 'motion/react'
 import { SplashPage } from '@/pages/Splash'
 import { ChatPage } from '@/pages/Chat'
@@ -41,10 +41,10 @@ export function App() {
   const [view, setView] = useState<ViewType>('splash')
   const [previousView, setPreviousView] = useState<ViewType>('chat')
 
-  const navigateTo = (newView: ViewType) => {
+  const navigateTo = useCallback((newView: ViewType) => {
     setPreviousView(view)
     setView(newView)
-  }
+  }, [view])
 
   const navigateToSettingsSubPage = (page: SettingsSubPage) => {
     navigateTo(`settings_${page}` as ViewType)
@@ -56,7 +56,7 @@ export function App() {
       const timer = setTimeout(() => navigateTo('chat'), 2500)
       return () => clearTimeout(timer)
     }
-  }, [])
+  }, [view, navigateTo])
 
   const renderSettingsSubPage = () => {
     const onBack = () => navigateTo('account')

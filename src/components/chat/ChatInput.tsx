@@ -16,7 +16,7 @@ import {
 } from 'lucide-react'
 
 interface ChatInputProps {
-  onSend: (text: string, images?: string[], audio?: string) => void
+  onSend: (_text: string, _images?: string[], _audio?: string) => void
   disabled?: boolean
   isStreaming?: boolean
 }

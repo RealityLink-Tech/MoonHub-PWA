@@ -22,7 +22,7 @@ export function usePWA() {
     updateServiceWorker,
   } = useRegisterSW({
     onRegistered(r) {
-      console.log('SW Registered:', r)
+      console.warn('SW Registered:', r)
     },
     onRegisterError(error) {
       console.error('SW registration error:', error)

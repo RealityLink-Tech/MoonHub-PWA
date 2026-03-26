@@ -10,8 +10,8 @@ import { Plus, MessageCircle, Trash2 } from 'lucide-react'
 interface ConversationListProps {
   conversations: Conversation[]
   currentId?: string | null
-  onSelect: (id: string) => void
-  onDelete: (id: string) => void
+  onSelect: (_id: string) => void
+  onDelete: (_id: string) => void
   onNew: () => void
 }
 

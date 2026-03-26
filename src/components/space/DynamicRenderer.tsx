@@ -416,7 +416,7 @@ const componentRegistry: Record<string, ComponentType<ComponentProps>> = {
         className={`rounded-lg bg-primary px-4 py-2 text-on-primary transition-colors hover:bg-primary-hover ${str(props.className)}`}
         onClick={() => {
           if (props.onClick && typeof props.onClick === 'string') {
-            console.log('Button action:', props.onClick)
+            console.warn('Button action:', props.onClick)
           }
         }}
       >

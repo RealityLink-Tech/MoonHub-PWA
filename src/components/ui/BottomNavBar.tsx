@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 
 interface BottomNavBarProps {
   current: string
-  onChange: (view: string) => void
+  onChange: (_view: string) => void
 }
 
 export function BottomNavBar({ current, onChange }: BottomNavBarProps) {

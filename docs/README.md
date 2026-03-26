@@ -47,29 +47,37 @@ This page is the **entry point and reading guide** for the PWA frontend document
 MoonHub-PWA/
 ├── src/
 │   ├── components/     # React components
-│   ├── hooks/          # Custom React hooks
-│   ├── services/       # API clients and services
+│   ├── hooks/          # Custom hooks (`index.ts` re-exports)
+│   ├── lib/            # Shared utilities (e.g. `utils.ts`)
+│   ├── pages/          # Route-level pages
+│   ├── services/       # API clients and services (per-file imports)
 │   ├── stores/         # Zustand state stores
-│   ├── types/          # TypeScript type definitions
-│   ├── utils/          # Utility functions
-│   └── App.tsx         # Main application component
+│   ├── types/          # TypeScript definitions
+│   ├── App.tsx         # Root component
+│   ├── AppInitializer.tsx
+│   ├── router.tsx      # TanStack Router tree
+│   ├── main.tsx        # Entry
+│   └── index.css
 ├── public/             # Static assets
 ├── docs/               # Documentation
-├── index.html          # Entry HTML
-├── vite.config.ts      # Vite configuration
-└── tsconfig.json       # TypeScript configuration
+├── index.html
+├── vite.config.ts
+└── tsconfig.json
 ```
 
 ## Tech Stack
 
 | Technology | Purpose |
 |------------|---------|
-| React 18 | UI framework |
+| React 19 | UI framework |
 | TypeScript | Type safety |
-| Vite | Build tool |
+| Vite 8 | Build tool |
+| TanStack Router | Routing |
 | Zustand | State management |
-| Tailwind CSS | Styling |
-| PWA | Offline support |
+| Tailwind CSS 4 | Styling |
+| vite-plugin-pwa / workbox-window | PWA install and updates |
+| Motion | UI animation |
+| Lucide React | Icons |
 
 ## Quick Reference
 
@@ -79,9 +87,9 @@ MoonHub-PWA/
 |------|-------------|
 | `src/main.tsx` | Application entry |
 | `src/App.tsx` | Root component |
-| `src/services/index.ts` | Service exports |
-| `src/stores/index.ts` | Store exports |
-| `src/hooks/index.ts` | Hook exports |
+| `src/router.tsx` | Route definitions |
+| `src/stores/index.ts` | Store re-exports |
+| `src/hooks/index.ts` | Hook re-exports |
 
 ### Key Services
 
@@ -91,6 +99,7 @@ MoonHub-PWA/
 | DeviceDiscovery | `discovery.ts` | LAN scanning |
 | StorageService | `storage.ts` | IndexedDB persistence |
 | VoiceService | `voice.ts` | Speech recognition/synthesis |
+| componentRecommendation | `componentRecommendation.ts` | Space “add component” suggestions (stub / mock until API) |
 
 ### Key Stores
 
@@ -111,24 +120,26 @@ MoonHub-PWA/
 | useVoice | `useVoice.ts` | Voice I/O |
 | useTheme | `useTheme.ts` | Theme switching |
 | usePWA | `usePWA.ts` | PWA features |
+| useAIUpdate | `useAIUpdate.ts` | Stub for future AI push updates (per-component subscription) |
 
 ## Development Commands
 
 ```bash
 # Install dependencies
-npm install
+pnpm install
 
 # Start dev server
-npm run dev
+pnpm dev
 
 # Build for production
-npm run build
+pnpm build
 
 # Preview production build
-npm run preview
+pnpm preview
 
-# Run linter
-npm run lint
+# Typecheck + lint (see package.json)
+pnpm typecheck
+pnpm lint
 ```
 
 ## Related Repositories

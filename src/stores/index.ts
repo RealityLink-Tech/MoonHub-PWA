@@ -23,19 +23,19 @@ interface DeviceState {
   connectionError: string | null
 
   // Actions
-  setDiscoveredDevices: (devices: Device[]) => void
-  addDiscoveredDevice: (device: Device) => void
+  setDiscoveredDevices: (_devices: Device[]) => void
+  addDiscoveredDevice: (_device: Device) => void
   clearDiscoveredDevices: () => void
-  setScanning: (scanning: boolean) => void
-  setScanProgress: (progress: { scanned: number; total: number } | null) => void
+  setScanning: (_scanning: boolean) => void
+  setScanProgress: (_progress: { scanned: number; total: number } | null) => void
 
-  pairDevice: (device: PairedDevice) => Promise<void>
-  unpairDevice: (deviceId: string) => Promise<void>
+  pairDevice: (_device: PairedDevice) => Promise<void>
+  unpairDevice: (_deviceId: string) => Promise<void>
   loadPairedDevices: () => Promise<void>
 
-  connect: (device: PairedDevice) => void
+  connect: (_device: PairedDevice) => void
   disconnect: () => void
-  setConnectionStatus: (status: DeviceState['connectionStatus'], error?: string) => void
+  setConnectionStatus: (_status: DeviceState['connectionStatus'], _error?: string) => void
 }
 
 export const useDeviceStore = create<DeviceState>()(

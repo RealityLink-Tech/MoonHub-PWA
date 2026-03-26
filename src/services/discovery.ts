@@ -8,8 +8,8 @@ import { MoonHubClient } from './device'
 
 export interface DiscoveryOptions {
   timeout?: number
-  onDeviceFound?: (device: Device) => void
-  onProgress?: (progress: DiscoveryProgress) => void
+  onDeviceFound?: (_device: Device) => void
+  onProgress?: (_progress: DiscoveryProgress) => void
 }
 
 export interface DiscoveryProgress {
