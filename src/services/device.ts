@@ -25,6 +25,144 @@ export interface MoonHubRequestMeta {
   timeoutMs?: number
 }
 
+// ==================== Pico Protocol Types ====================
+
+export interface PicoMessage {
+  type: string
+  id?: string
+  session_id?: string
+  timestamp?: number
+  payload?: Record<string, unknown>
+}
+
+export type AgentEventCallback = (event: {
+  kind: string
+  payload: Record<string, unknown>
+}) => void
+
+// ==================== WebSocket Manager ====================
+
+export class PicoWebSocket {
+  private ws: WebSocket | null = null
+  private url: string
+  private token: string
+  private sessionId: string
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null
+  private _isConnected = false
+  private messageQueue: PicoMessage[] = []
+  private agentEventCallback: AgentEventCallback | null = null
+  private onConnectionChange?: (connected: boolean) => void
+
+  constructor(url: string, token: string, sessionId: string) {
+    this.url = url
+    this.token = token
+    this.sessionId = sessionId
+  }
+
+  get isConnected() {
+    return this._isConnected
+  }
+
+  onAgentEvent(callback: AgentEventCallback) {
+    this.agentEventCallback = callback
+  }
+
+  onConnectionChange(callback: (connected: boolean) => void) {
+    this.onConnectionChange = callback
+  }
+
+  connect(): void {
+    if (this.ws?.readyState === WebSocket.OPEN) return
+
+    const wsUrl = `${this.url}/moonhub/ws?session_id=${encodeURIComponent(this.sessionId)}&token=${encodeURIComponent(this.token)}`
+
+    try {
+      this.ws = new WebSocket(wsUrl)
+    } catch {
+      this.scheduleReconnect()
+      return
+    }
+
+    this.ws.onopen = () => {
+      this._isConnected = true
+      this.onConnectionChange?.(true)
+      while (this.messageQueue.length > 0) {
+        const msg = this.messageQueue.shift()!
+        this.sendRaw(msg)
+      }
+    }
+
+    this.ws.onmessage = (event) => {
+      try {
+        const msg: PicoMessage = JSON.parse(event.data)
+        this.handleMessage(msg)
+      } catch {
+        // Skip invalid JSON
+      }
+    }
+
+    this.ws.onclose = () => {
+      this._isConnected = false
+      this.onConnectionChange?.(false)
+      this.scheduleReconnect()
+    }
+
+    this.ws.onerror = () => {
+      this._isConnected = false
+    }
+  }
+
+  disconnect(): void {
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer)
+      this.reconnectTimer = null
+    }
+    this.messageQueue = []
+    this.ws?.close()
+    this.ws = null
+    this._isConnected = false
+  }
+
+  sendMessage(content: string): void {
+    const msg: PicoMessage = {
+      type: 'message.send',
+      session_id: this.sessionId,
+      timestamp: Date.now(),
+      payload: { content },
+    }
+    this.send(msg)
+  }
+
+  private send(msg: PicoMessage): void {
+    if (this.ws?.readyState === WebSocket.OPEN) {
+      this.sendRaw(msg)
+    } else {
+      this.messageQueue.push(msg)
+    }
+  }
+
+  private sendRaw(msg: PicoMessage): void {
+    this.ws?.send(JSON.stringify(msg))
+  }
+
+  private handleMessage(msg: PicoMessage): void {
+    if (msg.type?.startsWith('agent.')) {
+      this.agentEventCallback?.({
+        kind: msg.type,
+        payload: msg.payload ?? {},
+      })
+    }
+  }
+
+  private scheduleReconnect(): void {
+    if (this.reconnectTimer) return
+    this.reconnectTimer = setTimeout(() => {
+      this.reconnectTimer = null
+      this.connect()
+    }, 3000)
+  }
+}
+
 function abortAfter(ms: number): AbortSignal {
   if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') {
     return AbortSignal.timeout(ms)
@@ -138,6 +276,30 @@ export class MoonHubClient {
   abort() {
     this.abortController?.abort()
     this.abortController = new AbortController()
+  }
+
+  // ==================== Pico WebSocket ====================
+
+  private picoWs: PicoWebSocket | null = null
+
+  connectPico(sessionId?: string): PicoWebSocket {
+    if (!this.authToken || !this.baseUrl) {
+      throw new Error('Cannot connect Pico: no auth token or base URL')
+    }
+    const wsUrl = this.baseUrl.replace(/^http/, 'ws')
+    const sid = sessionId || crypto.randomUUID()
+    this.picoWs = new PicoWebSocket(wsUrl, this.authToken, sid)
+    this.picoWs.connect()
+    return this.picoWs
+  }
+
+  getPico(): PicoWebSocket | null {
+    return this.picoWs
+  }
+
+  disconnectPico(): void {
+    this.picoWs?.disconnect()
+    this.picoWs = null
   }
 
   // ==================== Device Discovery ====================
@@ -345,6 +507,7 @@ export function createClient(baseUrl: string, authToken?: string): MoonHubClient
 }
 
 export function disconnectClient(): void {
+  clientInstance?.disconnectPico()
   clientInstance?.abort()
   clientInstance = null
 }
