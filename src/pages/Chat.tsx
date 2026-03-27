@@ -3,13 +3,10 @@
 // AI对话页面 - 与参考项目完全一致
 // ============================================================
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import {
   Sparkles,
-  ArrowDown,
-  FileText,
-  Download,
   Plus,
   Mic,
   ArrowUp,
@@ -19,12 +16,11 @@ import {
   X,
 } from 'lucide-react'
 import { Header } from '@/components/ui/Header'
+import { getClient, type PicoWebSocket } from '@/services/device'
 import { useChatStore } from '@/stores/chat'
-import { nanoid } from 'nanoid'
+import { ToolStatusIndicator } from '@/components/chat/ToolStatusIndicator'
+import { StreamingMessage } from '@/components/chat/StreamingMessage'
 import type { Message, MessageContent } from '@/types'
-
-// Mock conversation ID for demo
-const MOCK_CONVERSATION_ID = 'demo-conversation'
 
 export function ChatPage({ onAddClick }: { onAddClick: () => void }) {
   const [inputValue, setInputValue] = useState('')
@@ -33,51 +29,164 @@ export function ChatPage({ onAddClick }: { onAddClick: () => void }) {
   const cameraInputRef = useRef<HTMLInputElement>(null)
   const imageInputRef = useRef<HTMLInputElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const picoWsRef = useRef<PicoWebSocket | null>(null)
 
-  const { messages, isTyping, setTyping } = useChatStore()
+  const {
+    messages,
+    currentConversationId,
+    isStreaming,
+    streamingContent,
+    toolStatus,
+    addMessage,
+    setStreaming,
+    setToolStatus,
+    appendStreamContent,
+    finalizeStream,
+    clearStream,
+    createConversation,
+  } = useChatStore()
 
-  // Local messages state for demo (since store may be empty)
-  const [localMessages, setLocalMessages] = useState<Message[]>([])
-
-  // Combine store messages with local messages
-  const allMessages = [...messages, ...localMessages]
-
-  // Auto scroll to bottom when new messages arrive
+  // Auto scroll to bottom when new messages arrive or streaming content changes
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [allMessages.length])
+  }, [messages.length, streamingContent])
 
-  const handleSend = async () => {
-    if (!inputValue.trim()) return
+  // Connect to Pico WebSocket on mount
+  useEffect(() => {
+    const client = getClient()
+    if (!client) return
 
-    const userMessage: Message = {
-      id: nanoid(),
-      conversationId: MOCK_CONVERSATION_ID,
-      role: 'user',
-      content: { type: 'text', text: inputValue.trim() },
-      timestamp: Date.now(),
+    let sessionId = currentConversationId
+
+    // Create a conversation if none exists
+    async function ensureConversation() {
+      if (!sessionId) {
+        const conversation = await createConversation('local-device')
+        sessionId = conversation.id
+      }
+      try {
+        const ws = client.connectPico(sessionId)
+        picoWsRef.current = ws
+
+        ws.onAgentEvent(({ kind, payload }) => {
+          switch (kind) {
+            case 'agent.tool_start':
+              setToolStatus(payload.tool_name as string, 'running')
+              break
+            case 'agent.tool_end':
+              setToolStatus(
+                payload.tool_name as string,
+                payload.success ? 'done' : 'error',
+              )
+              break
+            case 'agent.content':
+              if (payload.done) {
+                finalizeStream()
+              } else {
+                setStreaming(true)
+                appendStreamContent(payload.content as string)
+              }
+              break
+            case 'agent.done':
+              finalizeStream()
+              break
+            case 'agent.error':
+              clearStream()
+              break
+          }
+        })
+      } catch {
+        // Connection failed - user can retry by sending a message
+      }
     }
 
-    setLocalMessages((prev) => [...prev, userMessage])
-    setInputValue('')
-    setTyping(true)
+    ensureConversation()
 
-    // Mock AI response
-    setTimeout(() => {
-      const aiMessage: Message = {
-        id: nanoid(),
-        conversationId: MOCK_CONVERSATION_ID,
-        role: 'assistant',
-        content: {
-          type: 'text',
-          text: getMockResponse(inputValue.trim()),
-        },
-        timestamp: Date.now(),
+    return () => {
+      client.disconnectPico()
+      picoWsRef.current = null
+    }
+    // Only run on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const handleSend = useCallback(async () => {
+    if (!inputValue.trim()) return
+
+    const text = inputValue.trim()
+    setInputValue('')
+
+    // Ensure we have a conversation and send via WebSocket
+    let convId = currentConversationId
+    if (!convId) {
+      const conversation = await createConversation('local-device')
+      convId = conversation.id
+    }
+
+    // Add user message to store
+    await addMessage({
+      conversationId: convId,
+      role: 'user',
+      content: { type: 'text', text },
+    })
+
+    // Send via WebSocket
+    const ws = picoWsRef.current
+    if (ws) {
+      ws.sendMessage(text)
+    } else {
+      // Try to reconnect
+      const client = getClient()
+      if (client) {
+        try {
+          const newWs = client.connectPico(convId)
+          picoWsRef.current = newWs
+
+          newWs.onAgentEvent(({ kind, payload }) => {
+            switch (kind) {
+              case 'agent.tool_start':
+                setToolStatus(payload.tool_name as string, 'running')
+                break
+              case 'agent.tool_end':
+                setToolStatus(
+                  payload.tool_name as string,
+                  payload.success ? 'done' : 'error',
+                )
+                break
+              case 'agent.content':
+                if (payload.done) {
+                  finalizeStream()
+                } else {
+                  setStreaming(true)
+                  appendStreamContent(payload.content as string)
+                }
+                break
+              case 'agent.done':
+                finalizeStream()
+                break
+              case 'agent.error':
+                clearStream()
+                break
+            }
+          })
+
+          newWs.sendMessage(text)
+        } catch {
+          // Connection failed
+        }
       }
-      setLocalMessages((prev) => [...prev, aiMessage])
-      setTyping(false)
-    }, 1500)
-  }
+    }
+  }, [
+    inputValue,
+    currentConversationId,
+    addMessage,
+    createConversation,
+    setStreaming,
+    setToolStatus,
+    appendStreamContent,
+    finalizeStream,
+    clearStream,
+  ])
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -90,9 +199,11 @@ export function ChatPage({ onAddClick }: { onAddClick: () => void }) {
     const file = e.target.files?.[0]
     if (!file) return
 
+    // For now, just note the file in a message
+    // Full file upload will be handled via WebSocket in a future iteration
     const fileMessage: Message = {
-      id: nanoid(),
-      conversationId: MOCK_CONVERSATION_ID,
+      id: crypto.randomUUID(),
+      conversationId: currentConversationId || 'temp',
       role: 'user',
       content: {
         type: 'file',
@@ -103,44 +214,17 @@ export function ChatPage({ onAddClick }: { onAddClick: () => void }) {
       timestamp: Date.now(),
     }
 
-    setLocalMessages((prev) => [...prev, fileMessage])
+    // We can't add to store without a conversation, so just show locally
+    // This will be properly integrated once file upload via WS is supported
     setShowAttachMenu(false)
-
-    // Reset input
     e.target.value = ''
-
-    // Mock AI response to file
-    setTyping(true)
-    setTimeout(() => {
-      const aiMessage: Message = {
-        id: nanoid(),
-        conversationId: MOCK_CONVERSATION_ID,
-        role: 'assistant',
-        content: {
-          type: 'text',
-          text: `已收到您的文件「${file.name}」(${formatFileSize(file.size)})。这是一个 mock 响应，实际功能需要后端 API 支持。`,
-        },
-        timestamp: Date.now(),
-      }
-      setLocalMessages((prev) => [...prev, aiMessage])
-      setTyping(false)
-    }, 1500)
+    void fileMessage
   }
 
   const formatFileSize = (bytes: number): string => {
     if (bytes < 1024) return bytes + ' B'
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
-  }
-
-  const getMockResponse = (input: string): string => {
-    const responses = [
-      '收到您的消息，这是一个 mock 响应。后端 API 接入后将提供真实的 AI 对话能力。',
-      '感谢您的提问！目前处于演示模式，无法提供真实回复。',
-      '您说：「' + input.slice(0, 20) + '...」——我已记录，待后端接入后将智能回复。',
-      '月枢正在待机中。请等待后端服务启动以获得完整的 AI 助手体验。',
-    ]
-    return responses[Math.floor(Math.random() * responses.length)]
   }
 
   const renderMessage = (message: Message) => {
@@ -216,7 +300,7 @@ export function ChatPage({ onAddClick }: { onAddClick: () => void }) {
 
       <main className="flex-1 pt-20 pb-32 px-4 md:px-0 max-w-3xl mx-auto w-full overflow-y-auto hide-scrollbar">
         {/* AI Welcome - only show when no messages */}
-        {allMessages.length === 0 && (
+        {messages.length === 0 && !isStreaming && (
           <div className="flex flex-col items-center text-center space-y-4 py-8">
             <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-primary to-primary-container flex items-center justify-center shadow-[0_0_25px_rgba(212,228,247,0.4)]">
               <Sparkles className="text-white w-8 h-8 fill-white/50" />
@@ -230,83 +314,40 @@ export function ChatPage({ onAddClick }: { onAddClick: () => void }) {
 
         {/* Chat Messages */}
         <div className="space-y-8">
-          {/* Demo messages (static examples) */}
-          {allMessages.length === 0 && (
-            <>
-              {/* User Message */}
-              <div className="flex flex-col items-end space-y-2 group">
-                <div className="bg-primary-container text-on-primary-container px-5 py-3 rounded-2xl rounded-tr-sm max-w-[85%] shadow-sm">
-                  <p className="text-sm">帮我整理一下上个月的财务报表，并预览那份关于"月之计划"的PDF文件。</p>
+          {/* Messages from store */}
+          {messages.map(renderMessage)}
+
+          {/* Streaming message */}
+          {isStreaming && streamingContent && (
+            <div className="flex flex-col items-start space-y-3">
+              <div className="flex items-center space-x-2">
+                <div className="w-6 h-6 rounded-full bg-primary-dim flex items-center justify-center">
+                  <Sparkles className="w-3 h-3 text-white fill-white" />
                 </div>
-                <span className="text-[10px] text-outline px-1 opacity-0 group-hover:opacity-100 transition-opacity">14:02 · 已发送</span>
+                <span className="text-xs font-bold text-primary tracking-widest uppercase">月枢</span>
               </div>
-
-              {/* AI Response */}
-              <div className="flex flex-col items-start space-y-3">
-                <div className="flex items-center space-x-2">
-                  <div className="w-6 h-6 rounded-full bg-primary-dim flex items-center justify-center">
-                    <Sparkles className="w-3 h-3 text-white fill-white" />
-                  </div>
-                  <span className="text-xs font-bold text-primary tracking-widest uppercase">月枢</span>
-                </div>
-
-                <div className="bg-surface-container-lowest border border-outline-variant/10 p-5 rounded-2xl rounded-tl-sm shadow-sm space-y-4 max-w-[90%]">
-                  <p className="text-sm text-on-surface leading-relaxed">好的。我已经同步了您的账户数据。这是上个月的**财务概览**以及您提到的**文件预览**。</p>
-
-                  {/* Financial Overview Card */}
-                  <div className="bg-surface-container-low rounded-xl p-4 shadow-[0_0_25px_rgba(212,228,247,0.4)] border border-white/40">
-                    <div className="flex justify-between items-start mb-4">
-                      <h4 className="text-base font-bold text-primary">财务概览</h4>
-                      <span className="text-xs text-outline-variant">2023年10月</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="bg-white/60 backdrop-blur-sm p-3 rounded-lg flex flex-col">
-                        <span className="text-[11px] text-on-surface-variant">总支出</span>
-                        <span className="text-lg font-bold text-primary">¥ 12,480.00</span>
-                      </div>
-                      <div className="bg-white/60 backdrop-blur-sm p-3 rounded-lg flex flex-col">
-                        <span className="text-[11px] text-on-surface-variant">环比增长</span>
-                        <span className="text-lg font-bold text-error flex items-center"><ArrowDown className="w-4 h-4 mr-1"/> 4.2%</span>
-                      </div>
-                    </div>
-                    <div className="mt-3 h-12 w-full bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-lg flex items-center px-4 overflow-hidden relative">
-                      <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_50%_120%,#506070,transparent)]"></div>
-                      <span className="text-xs text-primary font-medium relative z-10">主要支出项：云服务、设计订阅</span>
-                    </div>
-                  </div>
-
-                  {/* File Preview Card */}
-                  <div className="bg-surface-container-lowest border border-primary-container/30 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                    <div className="flex items-center p-3 space-x-4">
-                      <div className="w-12 h-12 bg-primary-container/20 rounded-lg flex items-center justify-center">
-                        <FileText className="text-primary w-6 h-6" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-on-surface truncate">月之计划_最终版_V2.pdf</p>
-                        <p className="text-xs text-outline-variant">12.4 MB · 昨天 18:30 更新</p>
-                      </div>
-                      <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container transition-colors">
-                        <Download className="w-4 h-4 text-primary" />
-                      </button>
-                    </div>
-                    <div className="aspect-[16/6] bg-surface-container-high relative overflow-hidden group">
-                      <img src="https://picsum.photos/seed/document/800/300?blur=2" alt="Preview" className="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" referrerPolicy="no-referrer" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent"></div>
-                      <div className="absolute bottom-2 right-2">
-                        <span className="bg-white/80 backdrop-blur-md text-[10px] px-2 py-1 rounded-full text-primary border border-primary-container/20">预览模式</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </>
+              <StreamingMessage content={streamingContent} />
+            </div>
           )}
 
-          {/* Dynamic messages */}
-          {allMessages.map(renderMessage)}
+          {/* Tool status indicator */}
+          {toolStatus && (
+            <div className="flex flex-col items-start space-y-3">
+              <div className="flex items-center space-x-2">
+                <div className="w-6 h-6 rounded-full bg-primary-dim flex items-center justify-center">
+                  <Sparkles className="w-3 h-3 text-white fill-white" />
+                </div>
+                <span className="text-xs font-bold text-primary tracking-widest uppercase">月枢</span>
+              </div>
+              <ToolStatusIndicator
+                toolName={toolStatus.name}
+                status={toolStatus.status}
+              />
+            </div>
+          )}
 
-          {/* Typing indicator */}
-          {isTyping && (
+          {/* Typing indicator - show when streaming just started with no content yet */}
+          {isStreaming && !streamingContent && (
             <div className="flex flex-col items-start space-y-3">
               <div className="flex items-center space-x-2">
                 <div className="w-6 h-6 rounded-full bg-primary-dim flex items-center justify-center">
