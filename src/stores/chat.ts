@@ -23,6 +23,9 @@ interface ChatState {
   // UI state
   isTyping: boolean
 
+  // Tool activity status
+  toolStatus: { name: string; status: 'running' | 'done' | 'error' } | null
+
   // Actions
   loadConversations: () => Promise<void>
   createConversation: (_deviceId: string, _title?: string) => Promise<Conversation>
@@ -35,6 +38,10 @@ interface ChatState {
 
   setStreaming: (_streaming: boolean, _content?: string) => void
   setTyping: (_typing: boolean) => void
+  setToolStatus: (name: string, status: 'running' | 'done' | 'error') => void
+  appendStreamContent: (chunk: string) => void
+  finalizeStream: () => void
+  clearStream: () => void
 
   // Helper
   getCurrentConversation: () => Conversation | undefined
@@ -47,6 +54,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   isStreaming: false,
   streamingContent: '',
   isTyping: false,
+  toolStatus: null,
 
   loadConversations: async () => {
     const storage = getStorage()
@@ -182,6 +190,28 @@ export const useChatStore = create<ChatState>((set, get) => ({
     set({ isStreaming: streaming, streamingContent: content }),
 
   setTyping: (typing) => set({ isTyping: typing }),
+
+  setToolStatus: (name, status) =>
+    set({ toolStatus: { name, status } }),
+
+  appendStreamContent: (chunk) =>
+    set((state) => ({
+      streamingContent: state.streamingContent + chunk,
+    })),
+
+  finalizeStream: () => {
+    const { streamingContent, currentConversationId } = get()
+    if (streamingContent && currentConversationId) {
+      get().addMessage({
+        conversationId: currentConversationId,
+        role: 'assistant',
+        content: { type: 'text', text: streamingContent },
+      })
+    }
+    set({ isStreaming: false, streamingContent: '' })
+  },
+
+  clearStream: () => set({ isStreaming: false, streamingContent: '', toolStatus: null }),
 
   getCurrentConversation: () => {
     const { conversations, currentConversationId } = get()
