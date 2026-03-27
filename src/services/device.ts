@@ -7,7 +7,6 @@ import type {
   ApiResponse,
   StreamCallback,
   StreamChunk,
-  PairedDevice,
 } from '@/types'
 import type {
   ChatRequest,
@@ -31,6 +30,7 @@ export interface PicoMessage {
   type: string
   id?: string
   session_id?: string
+  content?: string
   timestamp?: number
   payload?: Record<string, unknown>
 }
@@ -74,7 +74,7 @@ export class PicoWebSocket {
   connect(): void {
     if (this.ws?.readyState === WebSocket.OPEN) return
 
-    const wsUrl = `${this.url}/moonhub/ws?session_id=${encodeURIComponent(this.sessionId)}&token=${encodeURIComponent(this.token)}`
+    const wsUrl = `${this.url}/api/chat/ws?session_id=${encodeURIComponent(this.sessionId)}&token=${encodeURIComponent(this.token)}`
 
     try {
       this.ws = new WebSocket(wsUrl)
@@ -126,9 +126,7 @@ export class PicoWebSocket {
   sendMessage(content: string): void {
     const msg: PicoMessage = {
       type: 'message.send',
-      session_id: this.sessionId,
-      timestamp: Date.now(),
-      payload: { content },
+      content,
     }
     this.send(msg)
   }
@@ -314,8 +312,8 @@ export class MoonHubClient {
 
   // ==================== Authentication ====================
 
-  async pair(authCode: string): Promise<ApiResponse<{ token: string; device: PairedDevice }>> {
-    return this.request('/api/auth/pair', {
+  async pair(authCode: string): Promise<ApiResponse<{ token: string; device_id: string }>> {
+    return this.request('/api/auth/bind', {
       method: 'POST',
       body: JSON.stringify({ code: authCode }),
     })
@@ -460,9 +458,9 @@ export class MoonHubClient {
     return this.request('/api/config')
   }
 
-  async updateConfig(config: Partial<SystemConfig>): Promise<ApiResponse<SystemConfig>> {
+  async updateConfig(config: Record<string, unknown>): Promise<ApiResponse<{ status: string }>> {
     return this.request('/api/config', {
-      method: 'PUT',
+      method: 'PATCH',
       body: JSON.stringify(config),
     })
   }

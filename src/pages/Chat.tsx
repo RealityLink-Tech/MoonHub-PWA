@@ -79,7 +79,10 @@ export function ChatPage({ onAddClick }: { onAddClick: () => void }) {
                 payload.success ? 'done' : 'error',
               )
               break
-            case 'agent.content':
+            case 'agent.content_start':
+              setStreaming(true)
+              break
+            case 'agent.content_chunk':
               if (payload.done) {
                 finalizeStream()
               } else {
@@ -153,7 +156,10 @@ export function ChatPage({ onAddClick }: { onAddClick: () => void }) {
                   payload.success ? 'done' : 'error',
                 )
                 break
-              case 'agent.content':
+              case 'agent.content_start':
+                setStreaming(true)
+                break
+              case 'agent.content_chunk':
                 if (payload.done) {
                   finalizeStream()
                 } else {
