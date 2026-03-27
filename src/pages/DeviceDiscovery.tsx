@@ -3,6 +3,7 @@
 // 设备发现/扫描页面 - 与参考项目完全一致
 // ============================================================
 
+import { useState } from 'react'
 import { motion } from 'motion/react'
 import {
   Settings,
@@ -18,8 +19,11 @@ export function DeviceDiscoveryPage({
   onConnect,
 }: {
   onBack: () => void
-  onConnect: () => void
+  onConnect: (ip?: string) => void
 }) {
+  const [manualIP, setManualIP] = useState('')
+  const [showManualInput, setShowManualInput] = useState(false)
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -76,7 +80,7 @@ export function DeviceDiscoveryPage({
           </div>
 
           <div
-            onClick={onConnect}
+            onClick={() => onConnect('192.168.1.105')}
             className="group relative overflow-hidden p-5 rounded-xl bg-surface-container-low transition-all duration-300 hover:bg-surface-container-lowest hover:shadow-[0_12px_40px_rgba(80,96,112,0.06)] flex items-center gap-4 cursor-pointer"
           >
             <div className="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center text-primary transition-colors group-hover:bg-primary-container">
@@ -96,7 +100,7 @@ export function DeviceDiscoveryPage({
           </div>
 
           <div
-            onClick={onConnect}
+            onClick={() => onConnect('192.168.1.112')}
             className="group relative overflow-hidden p-5 rounded-xl bg-surface-container-low transition-all duration-300 hover:bg-surface-container-lowest hover:shadow-[0_12px_40px_rgba(80,96,112,0.06)] flex items-center gap-4 cursor-pointer"
           >
             <div className="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center text-primary transition-colors group-hover:bg-primary-container">
@@ -115,10 +119,39 @@ export function DeviceDiscoveryPage({
             </button>
           </div>
 
-          <div className="pt-6 flex justify-center">
-            <button className="text-xs text-primary/70 hover:text-primary transition-colors font-light tracking-widest border-b border-primary/20 pb-0.5">
+          <div className="pt-6 flex flex-col items-center">
+            <button
+              onClick={() => setShowManualInput(!showManualInput)}
+              className="text-xs text-primary/70 hover:text-primary transition-colors font-light tracking-widest border-b border-primary/20 pb-0.5"
+            >
               手动输入IP添加设备
             </button>
+            {showManualInput && (
+              <div className="mt-4 flex gap-2">
+                <input
+                  type="text"
+                  value={manualIP}
+                  onChange={(e) => setManualIP(e.target.value)}
+                  placeholder="192.168.1.100"
+                  className="flex-1 px-4 py-2 rounded-xl bg-surface-container-low border border-outline-variant/20 text-sm text-on-surface placeholder:text-outline-variant focus:outline-none focus:border-primary"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && manualIP.trim()) {
+                      onConnect(manualIP.trim())
+                    }
+                  }}
+                />
+                <button
+                  onClick={() => {
+                    if (manualIP.trim()) {
+                      onConnect(manualIP.trim())
+                    }
+                  }}
+                  className="px-4 py-2 rounded-xl bg-primary text-on-primary text-sm font-medium"
+                >
+                  连接
+                </button>
+              </div>
+            )}
           </div>
         </section>
       </main>

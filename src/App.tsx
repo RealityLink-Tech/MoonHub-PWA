@@ -12,6 +12,7 @@ import { SettingsPage } from '@/pages/Settings'
 import type { SettingsSubPage } from '@/pages/Settings'
 import { DeviceDiscoveryPage } from '@/pages/DeviceDiscovery'
 import { DeviceConnectionPage } from '@/pages/DeviceConnection'
+import { createClient } from '@/services/device'
 import {
   DevicesPage,
   ModelConfigPage,
@@ -106,7 +107,12 @@ export function App() {
         {view === 'device_discovery' && (
           <DeviceDiscoveryPage
             onBack={() => navigateTo(previousView === 'chat' ? 'chat' : 'account')}
-            onConnect={() => navigateTo('device_connection')}
+            onConnect={(ip?: string) => {
+              if (ip) {
+                createClient(`http://${ip}:18790`)
+              }
+              navigateTo('device_connection')
+            }}
           />
         )}
         {view === 'device_connection' && (
