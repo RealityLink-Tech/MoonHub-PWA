@@ -6,6 +6,7 @@
 import { useState, useRef } from 'react'
 import { motion } from 'motion/react'
 import { ArrowLeft, HelpCircle, Router, Zap } from 'lucide-react'
+import { getClient } from '@/services/device'
 
 export function DeviceConnectionPage({
   onBack,
@@ -55,16 +56,30 @@ export function DeviceConnectionPage({
     }
   }
 
-  const handleConnect = () => {
+  const handleConnect = async () => {
     const fullCode = code.join('')
     if (fullCode.length !== 6) {
       setError('请输入完整的 6 位授权码')
       return
     }
 
-    // Mock connection success
-    console.warn('Connecting with code:', fullCode)
-    onFinish()
+    const client = getClient()
+    if (!client) {
+      setError('未找到设备连接')
+      return
+    }
+
+    try {
+      const result = await client.pair(fullCode)
+      if (result.success && result.data) {
+        client.setAuthToken(result.data.token)
+        onFinish()
+      } else {
+        setError(result.error?.message || '授权码无效，请重试')
+      }
+    } catch {
+      setError('连接失败，请检查网络')
+    }
   }
 
   const isComplete = code.every(c => c !== '')
