@@ -51,7 +51,7 @@ export class PicoWebSocket {
   private _isConnected = false
   private messageQueue: PicoMessage[] = []
   private agentEventCallback: AgentEventCallback | null = null
-  private onConnectionChange?: (connected: boolean) => void
+  private connectionChangeCallback?: (connected: boolean) => void
 
   constructor(url: string, token: string, sessionId: string) {
     this.url = url
@@ -68,7 +68,7 @@ export class PicoWebSocket {
   }
 
   onConnectionChange(callback: (connected: boolean) => void) {
-    this.onConnectionChange = callback
+    this.connectionChangeCallback = callback
   }
 
   connect(): void {
@@ -85,7 +85,7 @@ export class PicoWebSocket {
 
     this.ws.onopen = () => {
       this._isConnected = true
-      this.onConnectionChange?.(true)
+      this.connectionChangeCallback?.(true)
       while (this.messageQueue.length > 0) {
         const msg = this.messageQueue.shift()!
         this.sendRaw(msg)
@@ -103,7 +103,7 @@ export class PicoWebSocket {
 
     this.ws.onclose = () => {
       this._isConnected = false
-      this.onConnectionChange?.(false)
+      this.connectionChangeCallback?.(false)
       this.scheduleReconnect()
     }
 

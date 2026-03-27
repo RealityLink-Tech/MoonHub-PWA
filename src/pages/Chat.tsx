@@ -65,7 +65,7 @@ export function ChatPage({ onAddClick }: { onAddClick: () => void }) {
         sessionId = conversation.id
       }
       try {
-        const ws = client.connectPico(sessionId)
+        const ws = client!.connectPico(sessionId)
         picoWsRef.current = ws
 
         ws.onAgentEvent(({ kind, payload }) => {
