@@ -17,6 +17,7 @@ import type {
   SpaceResponse,
   SkillInfo,
   SystemInfo,
+  ModelsResponse,
 } from '@/types/api'
 
 /** Per-request options (not sent over the wire). */
@@ -480,14 +481,21 @@ export class MoonHubClient {
 
   // ==================== Models ====================
 
-  async getModels(): Promise<ApiResponse<SystemConfig['models']>> {
+  async getModels(): Promise<ApiResponse<ModelsResponse>> {
     return this.request('/api/models')
   }
 
-  async setDefaultModel(modelId: string): Promise<ApiResponse<void>> {
+  async updateModel(index: number, data: { api_key?: string; api_base?: string; proxy?: string }): Promise<ApiResponse<{ status: string }>> {
+    return this.request(`/api/models/${index}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async setDefaultModel(modelName: string): Promise<ApiResponse<{ status: string; default_model: string }>> {
     return this.request('/api/models/default', {
       method: 'POST',
-      body: JSON.stringify({ modelId }),
+      body: JSON.stringify({ model_name: modelName }),
     })
   }
 }

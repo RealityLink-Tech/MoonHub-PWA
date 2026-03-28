@@ -45,6 +45,31 @@ export interface ModelConfig {
   capabilities?: string[]
 }
 
+/** Response from GET /api/models — matches backend modelResponse struct */
+export interface ModelEntry {
+  index: number
+  model_name: string
+  model: string
+  api_base?: string
+  api_key: string          // masked: "sk-****abcd"
+  proxy?: string
+  auth_method?: string
+  connect_mode?: string
+  workspace?: string
+  rpm?: number
+  max_tokens_field?: string
+  request_timeout?: number
+  thinking_level?: string
+  configured: boolean
+  is_default: boolean
+}
+
+export interface ModelsResponse {
+  models: ModelEntry[]
+  total: number
+  default_model: string
+}
+
 export interface ChannelConfig {
   type: string
   enabled: boolean
