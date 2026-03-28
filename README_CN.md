@@ -12,9 +12,10 @@ MoonHub PWA 是面向 **MoonHub AI 助手设备** 的渐进式 Web 应用：多�
 
 ## 核心功能
 
-- **设备发现** — 扫描局域网内的 MoonHub 设备。详见 [`docs/lan-discovery.md`](docs/lan-discovery.md)。
-- **安全配对** — 使用设备上显示的授权码完成绑定。详见 [`docs/lan-pairing.md`](docs/lan-pairing.md)。
-- **多模态对话** — 文字、语音（Web Speech 与可选录音）、图片。
+- **设备发现** — 子网 HTTP 扫描（含 MoonHub 默认端口 **18800**）；在已能访问设备 API 时也可通过 `MoonHubClient.discoverDevices()` 调用设备侧 `GET /api/discover`（mDNS）。详见 [`docs/lan-discovery.md`](docs/lan-discovery.md)。
+- **安全配对** — 使用设备授权码绑定（`POST /api/auth/pair`）。详见 [`docs/lan-pairing.md`](docs/lan-pairing.md)。
+- **多模态对话** — 文字、语音（Web Speech 与可选录音）、图片；助手回复 **Markdown**（GFM）渲染；`system_notice` 使用独立组件。详见 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)。
+- **频道（设置）** — 通过 MoonHub `/api/channels` 系列接口管理频道实例（局域网）。详见 [`docs/services.md`](docs/services.md) 与 MoonHub [`web/backend/api/README.md`](../MoonHub/web/backend/api/README.md)。
 - **AI 卡片** — 模型返回的结构化富媒体回复。
 - **Space 空间** — AI 动态生成界面（核心产品形态）。
 - **设置** — 主题、通知、设备管理。
@@ -59,6 +60,7 @@ pnpm lint
 | vite-plugin-pwa | PWA |
 | Lucide React | 图标 |
 | Motion | 动画 |
+| react-markdown + remark-gfm | 对话 Markdown 渲染 |
 
 ## 项目结构
 

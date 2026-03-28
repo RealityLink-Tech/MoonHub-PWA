@@ -85,11 +85,11 @@ async pair(authCode: string): Promise<ApiResponse<{token: string, device: Paired
 
 ```typescript
 async verifyToken(): Promise<ApiResponse<{valid: boolean}>> {
-  return this.request('/api/auth/verify')
+  return this.request('/api/auth/verify', { method: 'POST' })
 }
 ```
 
-Token 通过 `Authorization` 头自动附加：
+MoonHub 后端为 **POST** `/api/auth/verify`；Token 通过 `Authorization` 头由 `request()` 自动附加：
 
 ```typescript
 if (this.authToken) {

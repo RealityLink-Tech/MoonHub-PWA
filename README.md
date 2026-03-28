@@ -12,9 +12,10 @@ MoonHub PWA is a **progressive web app** for talking to MoonHub AI assistant dev
 
 ## Core features
 
-- **Device discovery** — Scan the LAN for MoonHub devices. See [`docs/lan-discovery.md`](docs/lan-discovery.md).
-- **Secure pairing** — Bind with an authorization code from the device. See [`docs/lan-pairing.md`](docs/lan-pairing.md).
-- **Multimodal chat** — Text, voice (Web Speech + optional recording), and images.
+- **Device discovery** — Subnet HTTP scan (includes MoonHub default port **18800**) plus optional `GET /api/discover` via `MoonHubClient` when calling a device directly. See [`docs/lan-discovery.md`](docs/lan-discovery.md).
+- **Secure pairing** — Bind with an authorization code from the device (`POST /api/auth/pair`). See [`docs/lan-pairing.md`](docs/lan-pairing.md).
+- **Multimodal chat** — Text, voice (Web Speech + optional recording), and images; assistant replies rendered as **Markdown** (GFM); `system_notice` messages use a dedicated UI. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+- **Channels (settings)** — List/create/update/delete channel instances against MoonHub `/api/channels` APIs (LAN). See [`docs/services.md`](docs/services.md) and MoonHub [`web/backend/api/README.md`](../MoonHub/web/backend/api/README.md).
 - **AI cards** — Rich structured replies from the model.
 - **Space** — AI-generated dynamic layouts (core product surface).
 - **Settings** — Theme, notifications, device management.
@@ -59,6 +60,7 @@ pnpm lint
 | vite-plugin-pwa | PWA |
 | Lucide React | Icons |
 | Motion | Animation |
+| react-markdown + remark-gfm | Chat Markdown rendering |
 
 ## Project layout
 

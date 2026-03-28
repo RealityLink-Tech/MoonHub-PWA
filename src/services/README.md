@@ -63,12 +63,15 @@ await client.updateConfig({ theme: 'dark' })
 |------|------|
 | `ping()` | 设备在线检测 |
 | `getDeviceStatus()` | 获取设备详细状态 |
-| `pair(authCode)` | 使用授权码配对 |
-| `verifyToken()` | 验证 Token 有效性 |
+| `discoverDevices()` | `GET /api/discover`（设备侧 mDNS） |
+| `getPairedDevices()` | `GET /api/devices` |
+| `pair(authCode)` | `POST /api/auth/pair` |
+| `verifyToken()` | `POST /api/auth/verify`（Bearer 由客户端带上） |
 | `chat(request)` | 同步对话 |
 | `chatStream(request)` | 流式对话 |
+| `getChannels()` / `createChannel` / `updateChannel` / `deleteChannel` / `getChannelStatus` / `getChannelCatalog` | 频道 CRUD 与目录 |
 | `getConfig()` | 获取配置 |
-| `updateConfig(config)` | 更新配置 |
+| `updateConfig(config)` | `PATCH /api/config` 部分更新 |
 
 ### DeviceDiscovery (`discovery.ts`)
 

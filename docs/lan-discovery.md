@@ -1,12 +1,14 @@
 # MoonHub PWA 设备发现实现文档
 
 > 状态: ✅ 已完成
-> 版本: 1.0
-> 更新日期: 2026-03-25
+> 版本: 1.1
+> 更新日期: 2026-03-29
 
 ## 概述
 
-本文档描述 MoonHub PWA 端的设备发现功能实现。由于浏览器安全限制，PWA 无法直接使用 mDNS，因此采用 HTTP 扫描方式发现局域网设备。
+本文档描述 MoonHub PWA 端的设备发现功能实现。由于浏览器安全限制，PWA **无法直接使用 mDNS**，因此发现页（[`DeviceDiscovery` 页面](../src/pages/DeviceDiscovery.tsx)）默认采用 **HTTP 子网 + 多端口扫描**：对推断出的局域网段并行探测一组端口，并对 `http://<ip>:<port>/api/ping` 发起请求。
+
+设备端另提供 **`GET /api/discover`**（由 MoonHub `mdns` 包在服务端扫描），[`MoonHubClient.discoverDevices()`](../src/services/device.ts) 可在已能访问某台设备 HTTP API 的前提下调用该端点；与发现页的子网扫描是互补关系。后端说明见 MoonHub [`web/backend/api/README.md`](../../MoonHub/web/backend/api/README.md)。
 
 ## 相关文件
 
@@ -57,10 +59,10 @@ interface DiscoveryProgress {
 ### 1.3 扫描端口
 
 ```typescript
-const COMMON_PORTS = [8080, 3000, 8000, 5000, 9000]
+const COMMON_PORTS = [18800, 8080, 3000, 8000, 5000, 9000]
 ```
 
-> 注：MoonHub 默认使用 18800 端口，但 PWA 需要配置文件中指定
+> **18800** 为 MoonHub Web 后端默认端口，已包含在扫描列表首位。
 
 ### 1.4 扫描流程
 

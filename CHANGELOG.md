@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added / fixed - 2026-03-29
+
+- **Client ↔ API alignment** — `pair()` uses `POST /api/auth/pair`; `verifyToken()` uses `POST /api/auth/verify`. Subnet discovery scans **18800** first (MoonHub default).
+- **Documentation** — `docs/README.md` (chat UI pointers, tech stack), `docs/services.md` (full `MoonHubClient` table + discovery notes), `docs/ARCHITECTURE.md` (Markdown/SystemNotice, endpoint list, backend link), `docs/lan-discovery.md` (mDNS API vs browser scan, port list). `src/services/README.md` updated to match.
+
 ### Documentation - 2026-03-27
 
 - **README split** — English `README.md` and Chinese `README_CN.md` (MoonHub-style cross-links, docs + changelog pointers at top).

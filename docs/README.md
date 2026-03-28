@@ -4,12 +4,14 @@ This page is the **entry point and reading guide** for the PWA frontend document
 
 ## Recommended Reading Order (First Time)
 
-1. [Architecture Overview](./ARCHITECTURE.md) — PWA architecture, tech stack, and design decisions
-2. [LAN Discovery](./lan-discovery.md) — Device discovery implementation
+1. [Architecture Overview](./ARCHITECTURE.md) — PWA architecture, tech stack, design decisions, and backend endpoint summary
+2. [LAN Discovery](./lan-discovery.md) — Device discovery implementation (HTTP subnet scan + optional mDNS client helpers)
 3. [LAN Pairing](./lan-pairing.md) — Device pairing flow
-4. [Services](./services.md) — Service layer API reference
+4. [Services](./services.md) — Service layer API reference (`MoonHubClient` paths aligned with MoonHub `web/backend/api`)
 5. [State Management](./stores.md) — Zustand stores reference
 6. [Hooks](./hooks.md) — Custom React hooks reference
+
+**Chat UI**: assistant text uses [`MarkdownRenderer`](../src/components/MarkdownRenderer.tsx) (react-markdown + remark-gfm); `system_notice` messages use [`SystemNotice`](../src/components/SystemNotice.tsx) on the Chat page—see [ARCHITECTURE.md](./ARCHITECTURE.md#对话与消息呈现).
 
 ## Documentation by Subsystem
 
@@ -78,6 +80,7 @@ MoonHub-PWA/
 | vite-plugin-pwa / workbox-window | PWA install and updates |
 | Motion | UI animation |
 | Lucide React | Icons |
+| react-markdown + remark-gfm | Chat assistant Markdown rendering |
 
 ## Quick Reference
 
@@ -95,8 +98,8 @@ MoonHub-PWA/
 
 | Service | File | Purpose |
 |---------|------|---------|
-| MoonHubClient | `device.ts` | API communication |
-| DeviceDiscovery | `discovery.ts` | LAN scanning |
+| MoonHubClient | `device.ts` | API communication (incl. `discoverDevices` / `getPairedDevices` / channel CRUD) |
+| DeviceDiscovery | `discovery.ts` | LAN HTTP port scan (WebRTC subnet; includes default port **18800**) |
 | StorageService | `storage.ts` | IndexedDB persistence |
 | VoiceService | `voice.ts` | Speech recognition/synthesis |
 | componentRecommendation | `componentRecommendation.ts` | Space “add component” suggestions (stub / mock until API) |

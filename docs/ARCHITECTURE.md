@@ -15,6 +15,7 @@ MoonHub PWA 是一个渐进式 Web 应用，用于与 MoonHub AI 助手设备进
 - **vite-plugin-pwa** - PWA 支持
 - **Lucide React** - 图标
 - **Motion** - 动画
+- **react-markdown** + **remark-gfm** - 对话中助手消息的 Markdown 渲染（GFM 表格、删除线等）
 
 ## 核心功能
 
@@ -29,6 +30,11 @@ MoonHub PWA 是一个渐进式 Web 应用，用于与 MoonHub AI 助手设备进
 - 图片发送
 - AI 生成式卡片回复
 - 流式响应
+
+### 对话与消息呈现
+
+- **助手文本**：[`MarkdownRenderer`](../src/components/MarkdownRenderer.tsx) 渲染流式与最终文本（react-markdown + remark-gfm，样式与 Tailwind 设计令牌对齐）。
+- **系统通知**：消息类型 `system_notice` 在 [`Chat` 页面](../src/pages/Chat.tsx) 中走 [`SystemNotice`](../src/components/SystemNotice.tsx)，用于配对提示等结构化提示（可选 `actions`）。
 
 ### 3. Space 空间（动态界面）
 - AI 生成 UI 组件
@@ -51,6 +57,8 @@ src/
 │   │   ├── GeneratedCard.tsx
 │   │   ├── MessageBubble.tsx
 │   │   └── StreamingMessage.tsx
+│   ├── MarkdownRenderer.tsx
+│   ├── SystemNotice.tsx
 │   ├── space/          # Space 组件
 │   │   └── DynamicRenderer.tsx
 │   ├── ui/             # 基础 UI 组件
@@ -104,23 +112,35 @@ src/
 ```
 GET  /api/ping                 # 在线检测
 GET  /api/system/info          # 系统信息
+GET  /api/discover             # 设备侧 mDNS 扫描（LAN）
+GET  /api/devices              # 已配对客户端列表（LAN）
 POST /api/auth/pair            # 配对
-GET  /api/auth/verify          # Token 校验
+POST /api/auth/verify          # Token 校验（Bearer 或 JSON body）
+GET  /api/auth/status          # 授权码状态
 POST /api/chat                 # 同步对话
 POST /api/chat/stream          # 流式对话
 POST /api/space/generate       # 生成 Space
 GET  /api/space/:id            # 获取 Space
 GET  /api/config               # 配置
-PUT  /api/config               # 更新配置
+PUT  /api/config               # 全量更新配置
+PATCH /api/config              # 部分更新配置（客户端常用）
 GET  /api/gateway/status       # 网关状态
 POST /api/gateway/start        # 启动网关
 POST /api/gateway/stop         # 停止网关
 GET  /api/gateway/events       # SSE（客户端用 EventSource）
+GET  /api/channels             # 频道实例列表
+POST /api/channels             # 新建频道配置
+PATCH /api/channels/{id}       # 更新频道
+DELETE /api/channels/{id}      # 删除频道
+GET  /api/channels/{id}/status # 频道状态
+GET  /api/channels/catalog     # 频道类型目录
 GET  /api/skills               # 技能列表
 POST /api/skills               # 安装技能
 GET  /api/models               # 模型列表
 POST /api/models/default       # 默认模型
 ```
+
+与 MoonHub 后端契约的权威说明见主仓库 [`web/backend/api/README.md`](../../MoonHub/web/backend/api/README.md)（分仓布局下的相对路径）。
 
 ## 状态管理
 

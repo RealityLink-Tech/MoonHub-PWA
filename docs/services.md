@@ -38,8 +38,10 @@ const currentClient = getClient()
 |--------|----------|-------------|
 | `ping()` | `GET /api/ping` | Device online check |
 | `getDeviceStatus()` | `GET /api/system/info` | System / device info |
-| `pair(authCode)` | `POST /api/auth/pair` | Pair with auth code |
-| `verifyToken()` | `GET /api/auth/verify` | Validate current token |
+| `discoverDevices()` | `GET /api/discover` | mDNS discovery on the device’s LAN (LAN-only on server; caller must reach device IP) |
+| `getPairedDevices()` | `GET /api/devices` | List paired clients stored on the device |
+| `pair(authCode)` | `POST /api/auth/pair` | Pair with auth code (`{ "code": "..." }`) |
+| `verifyToken()` | `POST /api/auth/verify` | Validate current token (`Authorization: Bearer` set by client) |
 | `chat(request)` | `POST /api/chat` | Synchronous chat |
 | `chatStream(request)` | `POST /api/chat/stream` | Streaming chat (SSE-style lines) |
 | `generateSpace(request)` | `POST /api/space/generate` | Generate Space layout |
@@ -48,11 +50,18 @@ const currentClient = getClient()
 | `startGateway()` / `stopGateway()` | `POST /api/gateway/start` · `POST /api/gateway/stop` | Control gateway |
 | `subscribeToGatewayEvents(onEvent, onError?)` | `GET /api/gateway/events` (SSE via `EventSource`) | Live gateway events; returns unsubscribe |
 | `getConfig()` | `GET /api/config` | Get device config |
-| `updateConfig(config)` | `PUT /api/config` | Update device config |
+| `updateConfig(config)` | `PATCH /api/config` | Partial config update |
+| `getChannels()` | `GET /api/channels` | List configured channel instances |
+| `createChannel(data)` | `POST /api/channels` | Add channel instance |
+| `updateChannel(id, data)` | `PATCH /api/channels/{id}` | Update channel config |
+| `deleteChannel(id)` | `DELETE /api/channels/{id}` | Remove channel instance |
+| `getChannelStatus(id)` | `GET /api/channels/{id}/status` | Runtime status for one channel |
+| `getChannelCatalog()` | `GET /api/channels/catalog` | Channel type catalog |
 | `getSkills()` | `GET /api/skills` | List skills |
 | `installSkill(skillUrl)` | `POST /api/skills` | Install skill from URL |
 | `getModels()` | `GET /api/models` | List models |
-| `setDefaultModel(modelId)` | `POST /api/models/default` | Set default model |
+| `setDefaultModel(modelName)` | `POST /api/models/default` | Set default model |
+| `updateModel` / `addModel` / `deleteModel` | `/api/models/...` | Extended model CRUD (see `device.ts`) |
 
 #### Usage Examples
 
@@ -86,7 +95,7 @@ for await (const chunk of client.chatStream({ message: 'Hello' })) {
 
 ### DeviceDiscovery
 
-LAN device discovery service.
+LAN device discovery service: **parallel HTTP scan** of the inferred subnet and a small set of ports (including **18800**, the MoonHub web default). This avoids relying on browser mDNS. When you already have a `MoonHubClient` pointed at a device, you can alternatively call **`discoverDevices()`** to use the server’s **mDNS** implementation (`GET /api/discover`).
 
 **File**: `src/services/discovery.ts`
 
