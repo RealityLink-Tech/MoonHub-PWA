@@ -48,7 +48,7 @@ export interface PairingResponse {
 export interface Message {
   id: string
   conversationId: string
-  role: 'user' | 'assistant' | 'system'
+  role: 'user' | 'assistant' | 'tool' | 'system_notice'
   content: MessageContent
   timestamp: number
   metadata?: MessageMetadata
@@ -234,3 +234,34 @@ export type AppEvent =
   | { type: 'message:sent'; message: Message }
   | { type: 'space:generated'; space: Space }
   | { type: 'notification'; title: string; body: string }
+
+// ==================== Device Discovery Types ====================
+
+export interface DiscoveredDevice {
+  id: string
+  name: string
+  version: string
+  addr: string
+  port: number
+  hostname?: string
+  agent_id?: string
+  agent_name?: string
+}
+
+// ==================== Channel Types ====================
+
+export interface ChannelInstance {
+  id: string
+  type: string
+  name: string
+  config: Record<string, unknown>
+  status: 'running' | 'stopped' | 'error'
+}
+
+export interface ChannelStatus {
+  id: string
+  status: 'running' | 'stopped' | 'error'
+  message?: string
+  connectedSince?: number
+  messageCount?: number
+}

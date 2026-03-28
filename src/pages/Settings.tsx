@@ -17,7 +17,7 @@ import {
   Settings,
 } from 'lucide-react'
 import { Header } from '@/components/ui/Header'
-import { mockUser, mockDevice, mockSystemPreferences } from '@/services/mock'
+import { mockUser, mockSystemPreferences } from '@/services/mock'
 
 export type SettingsSubPage = 'devices' | 'model' | 'channels' | 'privacy' | 'skills' | 'system'
 
@@ -76,10 +76,10 @@ export function SettingsPage({
               <span className="absolute top-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-white shadow-[0_0_8px_rgba(74,222,128,0.6)] animate-pulse"></span>
             </div>
             <div>
-              <h4 className="text-lg font-bold text-on-surface tracking-tight">{mockDevice.name}</h4>
+              <h4 className="text-lg font-bold text-on-surface tracking-tight">Lunar Hub</h4>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] uppercase tracking-widest font-bold text-green-500/80">已连接</span>
-                <span className="text-xs text-on-surface-variant/60">· 在线 {mockDevice.onlineHours}h</span>
+                <span className="text-xs text-on-surface-variant/60">· 在线 12h</span>
               </div>
             </div>
           </div>

@@ -7,6 +7,10 @@ import type {
   ApiResponse,
   StreamCallback,
   StreamChunk,
+  DiscoveredDevice,
+  PairedDevice,
+  ChannelInstance,
+  ChannelStatus,
 } from '@/types'
 import type {
   ChatRequest,
@@ -311,17 +315,25 @@ export class MoonHubClient {
     return this.request('/api/system/info', {}, meta)
   }
 
+  async discoverDevices(meta?: MoonHubRequestMeta): Promise<ApiResponse<DiscoveredDevice[]>> {
+    return this.request('/api/discover', {}, meta)
+  }
+
+  async getPairedDevices(meta?: MoonHubRequestMeta): Promise<ApiResponse<PairedDevice[]>> {
+    return this.request('/api/devices', {}, meta)
+  }
+
   // ==================== Authentication ====================
 
   async pair(authCode: string): Promise<ApiResponse<{ token: string; device_id: string }>> {
-    return this.request('/api/auth/bind', {
+    return this.request('/api/auth/pair', {
       method: 'POST',
       body: JSON.stringify({ code: authCode }),
     })
   }
 
   async verifyToken(): Promise<ApiResponse<{ valid: boolean }>> {
-    return this.request('/api/auth/verify')
+    return this.request('/api/auth/verify', { method: 'POST' })
   }
 
   // ==================== Chat ====================
@@ -497,6 +509,53 @@ export class MoonHubClient {
       method: 'POST',
       body: JSON.stringify({ model_name: modelName }),
     })
+  }
+
+  async addModel(data: { model_name: string; model: string; api_key?: string; api_base?: string; auth_method?: string }): Promise<ApiResponse<{ status: string; index: number }>> {
+    return this.request('/api/models', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async deleteModel(index: number): Promise<ApiResponse<{ status: string }>> {
+    return this.request(`/api/models/${index}`, {
+      method: 'DELETE',
+    })
+  }
+
+  // ==================== Channels ====================
+
+  async getChannels(): Promise<ApiResponse<ChannelInstance[]>> {
+    return this.request('/api/channels')
+  }
+
+  async createChannel(data: { type: string; name: string; config: Record<string, unknown> }): Promise<ApiResponse<{ id: string }>> {
+    return this.request('/api/channels', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async updateChannel(id: string, data: { name?: string; config?: Record<string, unknown> }): Promise<ApiResponse<{ id: string }>> {
+    return this.request(`/api/channels/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async deleteChannel(id: string): Promise<ApiResponse<{ id: string }>> {
+    return this.request(`/api/channels/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
+  async getChannelStatus(id: string): Promise<ApiResponse<ChannelStatus>> {
+    return this.request(`/api/channels/${id}/status`)
+  }
+
+  async getChannelCatalog(): Promise<ApiResponse<unknown>> {
+    return this.request('/api/channels/catalog')
   }
 }
 

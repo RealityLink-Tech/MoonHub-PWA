@@ -14,13 +14,14 @@ import {
   Image,
   Camera,
   X,
-  AlertCircle,
 } from 'lucide-react'
 import { Header } from '@/components/ui/Header'
 import { getClient, type PicoWebSocket } from '@/services/device'
 import { useChatStore } from '@/stores/chat'
 import { ToolStatusIndicator } from '@/components/chat/ToolStatusIndicator'
-import { StreamingMessage } from '@/components/chat/StreamingMessage'
+import { MarkdownRenderer } from '@/components/MarkdownRenderer'
+import { SystemNotice } from '@/components/SystemNotice'
+import { nanoid } from 'nanoid'
 import type { Message, MessageContent } from '@/types'
 
 export function ChatPage({ onAddClick, onGoToSettings }: { onAddClick: () => void; onGoToSettings: () => void }) {
@@ -129,6 +130,25 @@ export function ChatPage({ onAddClick, onGoToSettings }: { onAddClick: () => voi
     }
     checkModelConfig()
   }, [])
+
+  // Insert system_notice when model is not configured
+  const [systemNotices, setSystemNotices] = useState<Message[]>([])
+  useEffect(() => {
+    if (modelConfigured === false) {
+      const hasNotice = systemNotices.some(m => m.role === 'system_notice')
+      if (!hasNotice) {
+        setSystemNotices([{
+          id: nanoid(),
+          conversationId: '__system__',
+          role: 'system_notice',
+          content: { type: 'text', text: '尚未配置模型 API Key，无法开始对话。请前往设置配置。' },
+          timestamp: Date.now(),
+        }])
+      }
+    } else if (modelConfigured === true) {
+      setSystemNotices([])
+    }
+  }, [modelConfigured]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSend = useCallback(async () => {
     if (!inputValue.trim()) return
@@ -250,7 +270,21 @@ export function ChatPage({ onAddClick, onGoToSettings }: { onAddClick: () => voi
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
   }
 
-  const renderMessage = (message: Message) => {
+  const renderMessage = (message: Message, isAssistant?: boolean) => {
+    // System notice — renders as SystemNotice component
+    if (message.role === 'system_notice') {
+      const noticeText = message.content.type === 'text' ? message.content.text : ''
+      const actions = noticeText.includes('配置') ? [{ label: '前往配置', onClick: onGoToSettings }] : undefined
+      return (
+        <SystemNotice
+          key={message.id}
+          content={noticeText}
+          variant="warning"
+          actions={actions}
+        />
+      )
+    }
+
     const isUser = message.role === 'user'
     const content = message.content
 
@@ -261,7 +295,7 @@ export function ChatPage({ onAddClick, onGoToSettings }: { onAddClick: () => voi
       >
         {isUser ? (
           // User message
-          <div className="bg-primary-container text-on-primary-container px-5 py-3 rounded-2xl rounded-tr-sm max-w-[85%] shadow-sm">
+          <div className="bg-primary-container text-on-primary-container px-5 py-3 rounded-2xl rounded-tr-sm max-w-[85%] md:max-w-[80%] shadow-sm">
             {renderContent(content)}
           </div>
         ) : (
@@ -273,8 +307,8 @@ export function ChatPage({ onAddClick, onGoToSettings }: { onAddClick: () => voi
               </div>
               <span className="text-xs font-bold text-primary tracking-widest uppercase">月枢</span>
             </div>
-            <div className="bg-surface-container-lowest border border-outline-variant/10 p-5 rounded-2xl rounded-tl-sm shadow-sm max-w-[90%]">
-              {renderContent(content)}
+            <div className="bg-surface-container-lowest border border-outline-variant/10 p-5 rounded-2xl rounded-tl-sm shadow-sm max-w-[90%] md:max-w-[80%]">
+              {renderContent(content, isAssistant ?? true)}
             </div>
           </>
         )}
@@ -285,9 +319,12 @@ export function ChatPage({ onAddClick, onGoToSettings }: { onAddClick: () => voi
     )
   }
 
-  const renderContent = (content: MessageContent) => {
+  const renderContent = (content: MessageContent, useMarkdown = false) => {
     switch (content.type) {
       case 'text':
+        if (useMarkdown) {
+          return <MarkdownRenderer content={content.text} />
+        }
         return <p className="text-sm">{content.text}</p>
       case 'file':
         return (
@@ -321,29 +358,8 @@ export function ChatPage({ onAddClick, onGoToSettings }: { onAddClick: () => voi
     >
       <Header showAdd={true} onAddClick={onAddClick} />
 
-      {/* Model not configured banner */}
-      {modelConfigured === false && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="fixed top-16 left-0 w-full z-30 bg-amber-50 border-b border-amber-200/50 px-4 py-3"
-        >
-          <div className="max-w-3xl mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-amber-500 shrink-0" />
-              <p className="text-sm text-amber-800">
-                尚未配置模型 API Key，
-                <button onClick={onGoToSettings} className="text-amber-700 font-medium underline underline-offset-2">
-                  前往配置
-                </button>
-              </p>
-            </div>
-          </div>
-        </motion.div>
-      )}
-
-      <main className={`flex-1 pb-32 px-4 md:px-0 max-w-3xl mx-auto w-full overflow-y-auto hide-scrollbar ${modelConfigured === false ? 'pt-[calc(5rem+48px)]' : 'pt-20'}`}>
-        {/* AI Welcome - only show when no messages */}
+      <main className="flex-1 pb-32 px-3 md:px-4 max-w-3xl mx-auto w-full overflow-y-auto hide-scrollbar pt-20">
+        {/* AI Welcome - only show when no conversation messages */}
         {messages.length === 0 && !isStreaming && (
           <div className="flex flex-col items-center text-center space-y-4 py-8">
             <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-primary to-primary-container flex items-center justify-center shadow-[0_0_25px_rgba(212,228,247,0.4)]">
@@ -358,8 +374,11 @@ export function ChatPage({ onAddClick, onGoToSettings }: { onAddClick: () => voi
 
         {/* Chat Messages */}
         <div className="space-y-8">
+          {/* System notices */}
+          {systemNotices.map((notice) => renderMessage(notice))}
+
           {/* Messages from store */}
-          {messages.map(renderMessage)}
+          {messages.map((msg) => renderMessage(msg, msg.role === 'assistant'))}
 
           {/* Streaming message */}
           {isStreaming && streamingContent && (
@@ -370,7 +389,10 @@ export function ChatPage({ onAddClick, onGoToSettings }: { onAddClick: () => voi
                 </div>
                 <span className="text-xs font-bold text-primary tracking-widest uppercase">月枢</span>
               </div>
-              <StreamingMessage content={streamingContent} />
+              <div className="bg-surface-container-lowest border border-outline-variant/10 p-5 rounded-2xl rounded-tl-sm shadow-sm max-w-[90%] md:max-w-[80%]">
+                <MarkdownRenderer content={streamingContent} />
+                <span className="ml-1 inline-block h-4 w-1 animate-pulse bg-primary" />
+              </div>
             </div>
           )}
 
