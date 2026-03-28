@@ -3,17 +3,19 @@
 // 设置二级页面组件
 // ============================================================
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'motion/react'
-import { ArrowLeft, Monitor, Smartphone, Laptop, Wifi, WifiOff, Check } from 'lucide-react'
+import { ArrowLeft, Monitor, Smartphone, Laptop, Wifi, WifiOff, Check, Key, Star, ChevronDown, ChevronUp, Loader2, AlertCircle } from 'lucide-react'
 import {
   mockConnectedDevices,
-  mockModelConfigs,
   mockChannels,
   mockPrivacySettings,
   mockSkills,
   mockSystemConfig,
 } from '@/services/mock'
+import { getClient } from '@/services/device'
+import type { ModelEntry } from '@/types/api'
+import { groupModelsByProvider, providerDisplayName, needsApiKey } from '@/lib/models'
 
 // ============================================================
 // Connected Devices Page
@@ -91,7 +93,99 @@ export function DevicesPage({ onBack }: { onBack: () => void }) {
 // Model Config Page
 // ============================================================
 export function ModelConfigPage({ onBack }: { onBack: () => void }) {
-  const [activeModel, setActiveModel] = useState(mockModelConfigs[0].id)
+  const [models, setModels] = useState<ModelEntry[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null)
+  const [apiKeyInput, setApiKeyInput] = useState('')
+  const [saving, setSaving] = useState<number | null>(null)
+  const [defaulting, setDefaulting] = useState<string | null>(null)
+
+  // Fetch models on mount
+  useEffect(() => {
+    const fetchModels = async () => {
+      const client = getClient()
+      if (!client) {
+        setError('未连接到设备')
+        setLoading(false)
+        return
+      }
+
+      const result = await client.getModels()
+      if (result.success && result.data) {
+        setModels(result.data.models)
+      } else {
+        setError(result.error?.message || '加载模型失败')
+      }
+      setLoading(false)
+    }
+
+    fetchModels()
+  }, [])
+
+  // Handle save API key
+  const handleSave = async (index: number) => {
+    const client = getClient()
+    if (!client) return
+
+    setSaving(index)
+    const result = await client.updateModel(index, { api_key: apiKeyInput })
+    setSaving(null)
+
+    if (result.success) {
+      // Refresh models
+      const refreshResult = await client.getModels()
+      if (refreshResult.success && refreshResult.data) {
+        setModels(refreshResult.data.models)
+      }
+      setExpandedIndex(null)
+      setApiKeyInput('')
+    } else {
+      setError(result.error?.message || '保存失败')
+    }
+  }
+
+  // Handle set default model
+  const handleSetDefault = async (modelName: string) => {
+    const client = getClient()
+    if (!client) return
+
+    setDefaulting(modelName)
+    const result = await client.setDefaultModel(modelName)
+    setDefaulting(null)
+
+    if (result.success) {
+      // Refresh models
+      const refreshResult = await client.getModels()
+      if (refreshResult.success && refreshResult.data) {
+        setModels(refreshResult.data.models)
+      }
+    } else {
+      setError(result.error?.message || '设置默认模型失败')
+    }
+  }
+
+  // Handle expand/collapse model card
+  const handleToggleExpand = (index: number) => {
+    if (expandedIndex === index) {
+      setExpandedIndex(null)
+      setApiKeyInput('')
+    } else {
+      setExpandedIndex(index)
+      setApiKeyInput('')
+    }
+  }
+
+  // Get auth method badge text
+  const getAuthBadge = (model: ModelEntry): string => {
+    if (!needsApiKey(model)) {
+      const auth = (model.auth_method || '').toLowerCase()
+      if (auth === 'oauth') return 'OAuth'
+      if (auth === 'local') return '本地'
+      return 'CLI'
+    }
+    return model.configured ? '已配置' : '未配置'
+  }
 
   return (
     <motion.div
@@ -113,36 +207,131 @@ export function ModelConfigPage({ onBack }: { onBack: () => void }) {
         <div className="bg-gradient-to-b from-[#abb3b7]/10 to-transparent h-[1px]" />
       </header>
 
-      <main className="pt-24 px-6 pb-8 max-w-md mx-auto w-full space-y-4">
-        {mockModelConfigs.map((model) => (
-          <button
-            key={model.id}
-            onClick={() => setActiveModel(model.id)}
-            className={`w-full text-left bg-surface-container-lowest rounded-2xl p-4 border shadow-sm transition-all ${
-              activeModel === model.id
-                ? 'border-primary/50 ring-2 ring-primary/20'
-                : 'border-outline-variant/10'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="font-medium text-on-surface">{model.name}</h4>
-              {activeModel === model.id && (
-                <Check className="w-5 h-5 text-primary" />
-              )}
-            </div>
-            <p className="text-xs text-on-surface-variant mb-3">{model.provider}</p>
-            <div className="flex flex-wrap gap-2">
-              {model.capabilities.map((cap) => (
-                <span key={cap} className="text-[10px] px-2 py-1 rounded-full bg-primary-container/30 text-primary">
-                  {cap}
-                </span>
-              ))}
-              <span className="text-[10px] px-2 py-1 rounded-full bg-surface-container-high text-on-surface-variant">
-                {model.contextWindow}
-              </span>
-            </div>
-          </button>
-        ))}
+      <main className="pt-24 px-6 pb-8 max-w-md mx-auto w-full">
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 text-primary animate-spin" />
+          </div>
+        ) : error ? (
+          <div className="flex items-center gap-3 py-20 text-error">
+            <AlertCircle className="w-6 h-6" />
+            <span className="text-sm">{error}</span>
+          </div>
+        ) : models.length === 0 ? (
+          <div className="flex items-center justify-center py-20 text-on-surface-variant">
+            <span className="text-sm">暂无模型配置</span>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {Array.from(groupModelsByProvider(models).entries()).map(([provider, providerModels]) => (
+              <div key={provider} className="space-y-3">
+                <h3 className="text-sm font-bold text-on-surface-variant/60 uppercase tracking-[0.1em] px-1">
+                  {providerDisplayName(provider)}
+                </h3>
+                {providerModels.map((model) => {
+                  const isExpanded = expandedIndex === model.index
+                  const authBadge = getAuthBadge(model)
+                  const showApiKeyInput = needsApiKey(model)
+
+                  return (
+                    <div
+                      key={model.index}
+                      className="bg-surface-container-lowest rounded-2xl border border-outline-variant/10 shadow-sm overflow-hidden"
+                    >
+                      <button
+                        onClick={() => handleToggleExpand(model.index)}
+                        className="w-full px-4 py-3 flex items-center justify-between hover:bg-surface-container-low/50 transition-colors"
+                      >
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div className="flex-1 min-w-0 text-left">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-on-surface truncate">{model.model_name}</span>
+                              {model.is_default && (
+                                <Star className="w-4 h-4 text-primary fill-primary flex-shrink-0" />
+                              )}
+                            </div>
+                            <span className="text-xs text-on-surface-variant truncate block">{model.model}</span>
+                          </div>
+                          <span className={`text-[10px] px-2 py-1 rounded-full flex-shrink-0 ${
+                            model.configured && needsApiKey(model)
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-surface-container-high text-on-surface-variant'
+                          }`}>
+                            {authBadge}
+                          </span>
+                          {isExpanded ? (
+                            <ChevronUp className="w-5 h-5 text-on-surface-variant flex-shrink-0" />
+                          ) : (
+                            <ChevronDown className="w-5 h-5 text-on-surface-variant flex-shrink-0" />
+                          )}
+                        </div>
+                      </button>
+
+                      {isExpanded && (
+                        <div className="px-4 pb-4 pt-2 border-t border-outline-variant/10">
+                          {showApiKeyInput ? (
+                            <div className="space-y-3">
+                              <div className="flex items-center gap-2 text-sm text-on-surface-variant">
+                                <Key className="w-4 h-4" />
+                                <span>API 密钥</span>
+                              </div>
+                              <input
+                                type="password"
+                                value={apiKeyInput}
+                                onChange={(e) => setApiKeyInput(e.target.value)}
+                                placeholder={model.api_key || '输入 API 密钥'}
+                                className="w-full px-3 py-2 rounded-lg bg-surface-container-high border border-outline-variant/20 text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-on-surface-variant/50"
+                              />
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => handleSave(model.index)}
+                                  disabled={saving === model.index || !apiKeyInput.trim()}
+                                  className="flex-1 py-2 rounded-lg bg-primary text-primary-on text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                >
+                                  {saving === model.index ? (
+                                    <>
+                                      <Loader2 className="w-4 h-4 animate-spin" />
+                                      保存中...
+                                    </>
+                                  ) : (
+                                    '保存'
+                                  )}
+                                </button>
+                                <button
+                                  onClick={() => handleSetDefault(model.model_name)}
+                                  disabled={defaulting === model.model_name || model.is_default}
+                                  className="flex-1 py-2 rounded-lg bg-surface-container-high text-on-surface text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 hover:bg-surface-container transition-colors"
+                                >
+                                  {defaulting === model.model_name ? (
+                                    <>
+                                      <Loader2 className="w-4 h-4 animate-spin" />
+                                      设置中...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Star className="w-4 h-4" />
+                                      {model.is_default ? '已设为默认' : '设为默认'}
+                                    </>
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2 text-sm text-on-surface-variant">
+                              <span>此模型使用</span>
+                              <span className="font-medium text-primary">{authBadge}</span>
+                              <span>认证，无需配置 API 密钥</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            ))}
+          </div>
+        )}
       </main>
     </motion.div>
   )
