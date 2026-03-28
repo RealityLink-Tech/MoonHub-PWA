@@ -14,6 +14,7 @@ import {
   Image,
   Camera,
   X,
+  AlertCircle,
 } from 'lucide-react'
 import { Header } from '@/components/ui/Header'
 import { getClient, type PicoWebSocket } from '@/services/device'
@@ -22,9 +23,10 @@ import { ToolStatusIndicator } from '@/components/chat/ToolStatusIndicator'
 import { StreamingMessage } from '@/components/chat/StreamingMessage'
 import type { Message, MessageContent } from '@/types'
 
-export function ChatPage({ onAddClick }: { onAddClick: () => void }) {
+export function ChatPage({ onAddClick, onGoToSettings }: { onAddClick: () => void; onGoToSettings: () => void }) {
   const [inputValue, setInputValue] = useState('')
   const [showAttachMenu, setShowAttachMenu] = useState(false)
+  const [modelConfigured, setModelConfigured] = useState<boolean | null>(null) // null = checking
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
   const imageInputRef = useRef<HTMLInputElement>(null)
@@ -111,6 +113,21 @@ export function ChatPage({ onAddClick }: { onAddClick: () => void }) {
     }
     // Only run on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Check model configuration on mount
+  useEffect(() => {
+    async function checkModelConfig() {
+      const client = getClient()
+      if (!client) { setModelConfigured(false); return }
+      const res = await client.getModels()
+      if (res.success && res.data) {
+        setModelConfigured(res.data.models.some(m => m.configured))
+      } else {
+        setModelConfigured(false)
+      }
+    }
+    checkModelConfig()
   }, [])
 
   const handleSend = useCallback(async () => {
@@ -304,7 +321,28 @@ export function ChatPage({ onAddClick }: { onAddClick: () => void }) {
     >
       <Header showAdd={true} onAddClick={onAddClick} />
 
-      <main className="flex-1 pt-20 pb-32 px-4 md:px-0 max-w-3xl mx-auto w-full overflow-y-auto hide-scrollbar">
+      {/* Model not configured banner */}
+      {modelConfigured === false && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed top-16 left-0 w-full z-30 bg-amber-50 border-b border-amber-200/50 px-4 py-3"
+        >
+          <div className="max-w-3xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-amber-500 shrink-0" />
+              <p className="text-sm text-amber-800">
+                尚未配置模型 API Key，
+                <button onClick={onGoToSettings} className="text-amber-700 font-medium underline underline-offset-2">
+                  前往配置
+                </button>
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      <main className={`flex-1 pb-32 px-4 md:px-0 max-w-3xl mx-auto w-full overflow-y-auto hide-scrollbar ${modelConfigured === false ? 'pt-[calc(5rem+48px)]' : 'pt-20'}`}>
         {/* AI Welcome - only show when no messages */}
         {messages.length === 0 && !isStreaming && (
           <div className="flex flex-col items-center text-center space-y-4 py-8">

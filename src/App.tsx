@@ -90,7 +90,7 @@ export function App() {
           <SplashPage onFinish={() => navigateTo('chat')} />
         )}
         {view === 'chat' && (
-          <ChatPage onAddClick={() => navigateTo('device_discovery')} />
+          <ChatPage onAddClick={() => navigateTo('device_discovery')} onGoToSettings={() => navigateTo('settings_model')} />
         )}
         {view === 'space' && (
           <SpacePage onAddClick={() => navigateTo('space_extension')} />
