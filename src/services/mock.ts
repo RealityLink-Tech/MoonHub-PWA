@@ -12,13 +12,6 @@ export const mockUser = {
   verified: true,
 }
 
-// 模拟设备数据
-export const mockDevice = {
-  id: 'lunar_hub_001',
-  name: 'Lunar Hub',
-  status: 'connected' as const,
-  onlineHours: 12,
-}
 
 // 模拟财务数据
 export const mockFinancialData = {
@@ -241,36 +234,6 @@ export const mockSystemPreferences = [
   { id: 'system', icon: 'Settings', label: '系统配置' },
 ]
 
-// 模拟已连接设备列表
-export const mockConnectedDevices = [
-  {
-    id: '1',
-    name: 'Lunar Hub Pro',
-    type: 'hub',
-    status: 'online',
-    lastActive: '刚刚',
-    ip: '192.168.1.100',
-    version: 'v2.1.0',
-  },
-  {
-    id: '2',
-    name: 'iPhone 15 Pro',
-    type: 'phone',
-    status: 'online',
-    lastActive: '5分钟前',
-    ip: '192.168.1.101',
-    version: 'v1.8.5',
-  },
-  {
-    id: '3',
-    name: 'MacBook Pro',
-    type: 'laptop',
-    status: 'offline',
-    lastActive: '2小时前',
-    ip: '192.168.1.102',
-    version: 'v1.8.5',
-  },
-]
 
 // 模拟模型配置
 export const mockModelConfigs = [
@@ -300,37 +263,6 @@ export const mockModelConfigs = [
   },
 ]
 
-// 模拟外部频道
-export const mockChannels = [
-  {
-    id: '1',
-    name: 'Notion',
-    icon: 'FileText',
-    status: 'connected',
-    lastSync: '10分钟前',
-  },
-  {
-    id: '2',
-    name: 'Slack',
-    icon: 'MessageSquare',
-    status: 'connected',
-    lastSync: '5分钟前',
-  },
-  {
-    id: '3',
-    name: 'Google Calendar',
-    icon: 'Calendar',
-    status: 'disconnected',
-    lastSync: '从未',
-  },
-  {
-    id: '4',
-    name: 'GitHub',
-    icon: 'Github',
-    status: 'connected',
-    lastSync: '1小时前',
-  },
-]
 
 // 模拟隐私权限设置
 export const mockPrivacySettings = [

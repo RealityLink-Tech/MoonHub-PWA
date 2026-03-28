@@ -18,8 +18,8 @@ export interface DiscoveryProgress {
   currentRange: string
 }
 
-// Common ports MoonHub might be running on
-const COMMON_PORTS = [8080, 3000, 8000, 5000, 9000]
+// Common ports MoonHub might be running on (18800 = MoonHub web backend default)
+const COMMON_PORTS = [18800, 8080, 3000, 8000, 5000, 9000]
 
 // Default timeout for discovery
 const DEFAULT_TIMEOUT = 5000

@@ -64,7 +64,7 @@ export function App() {
 
     switch (view) {
       case 'settings_devices':
-        return <DevicesPage onBack={onBack} />
+        return <DevicesPage onBack={onBack} onNavigateToDiscovery={() => navigateTo('device_discovery')} />
       case 'settings_model':
         return <ModelConfigPage onBack={onBack} />
       case 'settings_channels':
