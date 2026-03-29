@@ -4,7 +4,7 @@
 // ============================================================
 
 import { motion } from 'motion/react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { PlusCircle, ArrowRight } from 'lucide-react'
 import { Header } from '@/components/ui/Header'
 import { DynamicRenderer } from '@/components/space/DynamicRenderer'
@@ -22,23 +22,38 @@ export function SpacePage({ onAddClick, onToolClick }: SpacePageProps) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    let mounted = true
+
     dynamicToolsService.list().then((res) => {
+      if (!mounted) return
       if (res.success && res.data) {
         const home = res.data.filter((t) => t.is_on_home)
         setHomeTools(home)
+
         // 为每个首页工具执行获取数据
-        home.forEach(async (tool) => {
+        const promises = home.map(async (tool) => {
           const execRes = await dynamicToolsService.execute(tool.id, {}, 'space')
+          if (!mounted) return null
           if (execRes.success && execRes.data) {
             const schema = execRes.data.schema
-            setToolResults((prev) => new Map(prev).set(tool.id, schema ? [schema] : [tool.space_schema]))
-          } else {
-            setToolResults((prev) => new Map(prev).set(tool.id, [tool.space_schema]))
+            return { id: tool.id, components: schema ? [schema] : [tool.space_schema] }
           }
+          return { id: tool.id, components: [tool.space_schema] }
+        })
+
+        Promise.all(promises).then((results) => {
+          if (!mounted) return
+          const newMap = new Map<string, GeneratedComponent[]>()
+          for (const r of results) {
+            if (r) newMap.set(r.id, r.components)
+          }
+          setToolResults(newMap)
         })
       }
       setLoading(false)
     })
+
+    return () => { mounted = false }
   }, [])
 
   return (
@@ -98,10 +113,4 @@ export function SpacePage({ onAddClick, onToolClick }: SpacePageProps) {
       </main>
     </motion.div>
   )
-}
-
-// SpaceExtensionPage 已被 SpaceAddPage 替代，保留空导出避免编译错误
-export function SpaceExtensionPage({ onBack }: { onBack: () => void }) {
-  onBack()
-  return null
 }

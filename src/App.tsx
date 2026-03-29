@@ -7,7 +7,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { AnimatePresence } from 'motion/react'
 import { SplashPage } from '@/pages/Splash'
 import { ChatPage } from '@/pages/Chat'
-import { SpacePage, SpaceExtensionPage } from '@/pages/Space'
+import { SpacePage } from '@/pages/Space'
 import { SpaceAdd } from '@/pages/SpaceAdd'
 import { SpaceDetail } from '@/pages/SpaceDetail'
 import { SettingsPage } from '@/pages/Settings'
@@ -29,7 +29,6 @@ export type ViewType =
   | 'splash'
   | 'chat'
   | 'space'
-  | 'space_extension'
   | 'space_add'
   | 'space_detail'
   | 'account'
@@ -103,17 +102,19 @@ export function App() {
             onToolClick={(id) => { setSelectedToolId(id); navigateTo('space_detail') }}
           />
         )}
-        {view === 'space_extension' && (
-          <SpaceExtensionPage onBack={() => navigateTo('space')} />
-        )}
         {view === 'space_add' && (
           <SpaceAdd
             onBack={() => navigateTo('space')}
             onToolSelect={(id) => { setSelectedToolId(id); navigateTo('space_detail') }}
           />
         )}
-        {view === 'space_detail' && selectedToolId && (
-          <SpaceDetail toolId={selectedToolId} onBack={() => navigateTo('space')} />
+        {view === 'space_detail' && (
+          selectedToolId
+            ? <SpaceDetail toolId={selectedToolId} onBack={() => navigateTo('space')} />
+            : <SpacePage
+                onAddClick={() => navigateTo('space_add')}
+                onToolClick={(id) => { setSelectedToolId(id); navigateTo('space_detail') }}
+              />
         )}
         {view === 'account' && (
           <SettingsPage
