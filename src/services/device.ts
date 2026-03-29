@@ -136,7 +136,15 @@ export class PicoWebSocket {
     this.send(msg)
   }
 
-  private send(msg: PicoMessage): void {
+  send(msg: PicoMessage): void {
+    if (this.ws?.readyState === WebSocket.OPEN) {
+      this.sendRaw(msg)
+    } else {
+      this.messageQueue.push(msg)
+    }
+  }
+
+  private sendRaw(msg: PicoMessage): void {
     if (this.ws?.readyState === WebSocket.OPEN) {
       this.sendRaw(msg)
     } else {
