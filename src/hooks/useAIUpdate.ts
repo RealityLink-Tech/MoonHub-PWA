@@ -26,7 +26,9 @@ export function useAIUpdate(
 ) {
   // 使用 useRef 保存回调，避免每次渲染都重新订阅
   const onUpdateRef = useRef(onUpdate)
-  onUpdateRef.current = onUpdate
+  useEffect(() => {
+    onUpdateRef.current = onUpdate
+  })
 
   // 注册全局 WebSocket 监听器（只执行一次）
   useEffect(() => {
