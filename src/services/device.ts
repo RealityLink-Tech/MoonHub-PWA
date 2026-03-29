@@ -145,14 +145,6 @@ export class PicoWebSocket {
   }
 
   private sendRaw(msg: PicoMessage): void {
-    if (this.ws?.readyState === WebSocket.OPEN) {
-      this.sendRaw(msg)
-    } else {
-      this.messageQueue.push(msg)
-    }
-  }
-
-  private sendRaw(msg: PicoMessage): void {
     this.ws?.send(JSON.stringify(msg))
   }
 
@@ -564,6 +556,43 @@ export class MoonHubClient {
 
   async getChannelCatalog(): Promise<ApiResponse<unknown>> {
     return this.request('/api/channels/catalog')
+  }
+
+  // ==================== Dynamic Tools ====================
+
+  async listDynamicTools(source?: string): Promise<ApiResponse<unknown>> {
+    const query = source ? `?source=${source}` : ''
+    return this.request(`/api/dynamic-tools${query}`)
+  }
+
+  async generateDynamicTool(prompt: string, context?: string): Promise<ApiResponse<unknown>> {
+    return this.request('/api/dynamic-tools/generate', {
+      method: 'POST',
+      body: JSON.stringify({ prompt, context }),
+    })
+  }
+
+  async executeDynamicTool(toolId: string, params: Record<string, unknown>, mode?: string): Promise<ApiResponse<unknown>> {
+    return this.request(`/api/dynamic-tools/${toolId}/execute`, {
+      method: 'POST',
+      body: JSON.stringify({ params, mode }),
+    })
+  }
+
+  async getDynamicToolSchema(toolId: string, mode?: string): Promise<ApiResponse<unknown>> {
+    const query = mode ? `?mode=${mode}` : ''
+    return this.request(`/api/dynamic-tools/${toolId}/schema${query}`)
+  }
+
+  async deleteDynamicTool(toolId: string): Promise<ApiResponse<unknown>> {
+    return this.request(`/api/dynamic-tools/${toolId}`, { method: 'DELETE' })
+  }
+
+  async setDynamicToolOnHome(toolId: string, onHome: boolean): Promise<ApiResponse<unknown>> {
+    return this.request(`/api/dynamic-tools/${toolId}/home`, {
+      method: 'PATCH',
+      body: JSON.stringify({ on_home: onHome }),
+    })
   }
 }
 

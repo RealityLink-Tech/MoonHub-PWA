@@ -33,7 +33,7 @@ export function useAIUpdate(
     if (isGlobalListenerRegistered) return
 
     const client = getClient()
-    const picoWs = client?.picoWs ?? null
+    const picoWs = client?.getPico() ?? null
 
     if (!picoWs) {
       console.warn('[useAIUpdate] PicoWebSocket not available')
@@ -92,7 +92,7 @@ export function useAIUpdate(
   // 手动触发更新请求
   const requestUpdate = useCallback(() => {
     const client = getClient()
-    const picoWs = client?.picoWs ?? null
+    const picoWs = client?.getPico() ?? null
 
     if (!picoWs) {
       console.warn('[useAIUpdate] Cannot request update: PicoWebSocket not available')
