@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { Header } from '@/components/ui/Header'
 import { getClient, type PicoWebSocket } from '@/services/device'
+import { DynamicRenderer } from '@/components/space/DynamicRenderer'
 import { useChatStore } from '@/stores/chat'
 import { ToolStatusIndicator } from '@/components/chat/ToolStatusIndicator'
 import { MarkdownRenderer } from '@/components/MarkdownRenderer'
@@ -344,6 +345,10 @@ export function ChatPage({ onAddClick, onGoToSettings }: { onAddClick: () => voi
             {content.url && <img src={content.url} alt={content.caption || ''} className="rounded-lg" />}
             {content.caption && <p className="text-xs mt-1 text-on-surface-variant">{content.caption}</p>}
           </div>
+        )
+      case 'card':
+        return (
+          <DynamicRenderer components={[{ id: `card-${Date.now()}`, type: content.cardType, props: content.data }]} />
         )
       default:
         return <p className="text-sm text-on-surface-variant">[不支持的消息类型]</p>
