@@ -57,6 +57,12 @@ const currentClient = getClient()
 | `deleteChannel(id)` | `DELETE /api/channels/{id}` | Remove channel instance |
 | `getChannelStatus(id)` | `GET /api/channels/{id}/status` | Runtime status for one channel |
 | `getChannelCatalog()` | `GET /api/channels/catalog` | Channel type catalog |
+| `listDynamicTools(source?)` | `GET /api/dynamic-tools` | List AI / dynamic tools (`?source=ai`) |
+| `generateDynamicTool(prompt, context?)` | `POST /api/dynamic-tools/generate` | Create or dedupe tool from prompt (`context`: `chat` / `space`) |
+| `executeDynamicTool(id, params, mode?)` | `POST /api/dynamic-tools/{id}/execute` | Run tool; `mode` `chat` or `space` |
+| `getDynamicToolSchema(id, mode?)` | `GET /api/dynamic-tools/{id}/schema` | Fetch schema for rendering |
+| `deleteDynamicTool(id)` | `DELETE /api/dynamic-tools/{id}` | Remove tool |
+| `setDynamicToolOnHome(id, onHome)` | `PATCH /api/dynamic-tools/{id}/home` | Pin on Space home (`on_home` in body) |
 | `getSkills()` | `GET /api/skills` | List skills |
 | `installSkill(skillUrl)` | `POST /api/skills` | Install skill from URL |
 | `getModels()` | `GET /api/models` | List models |
@@ -92,6 +98,31 @@ for await (const chunk of client.chatStream({ message: 'Hello' })) {
   console.log('Chunk:', chunk.content)
 }
 ```
+
+### Dynamic tools (`dynamicToolsService`)
+
+High-level wrapper over `MoonHubClient` dynamic-tool methods. Used by Space home, Space detail, and Space add flows.
+
+**File**: `src/services/dynamicTools.ts`
+
+```typescript
+import { dynamicToolsService } from '@/services/dynamicTools'
+
+const list = await dynamicToolsService.list('ai')
+const gen = await dynamicToolsService.generate('Weather for my city', 'space')
+const exec = await dynamicToolsService.execute(toolId, {}, 'space')
+```
+
+| Method | Maps to |
+| --- | --- |
+| `list(source?)` | `listDynamicTools` |
+| `generate(prompt, context?)` | `generateDynamicTool` |
+| `execute(id, params?, mode?)` | `executeDynamicTool` |
+| `getSchema(id, mode?)` | `getDynamicToolSchema` |
+| `delete(id)` | `deleteDynamicTool` |
+| `setOnHome(id, onHome)` | `setDynamicToolOnHome` |
+
+Backend reference: MoonHub [`web/backend/api/README.md`](../../MoonHub/web/backend/api/README.md) (`/api/dynamic-tools`).
 
 ### DeviceDiscovery
 
@@ -338,4 +369,6 @@ const voice = getVoice()
 - [State Management](./stores.md)
 - [Hooks](./hooks.md)
 - [LAN Discovery](./lan-discovery.md)
+- [Architecture — dynamic tools](./ARCHITECTURE.md#动态工具与-dynamicrenderer)
+- [MoonHub pkg/dynamictools](../../MoonHub/pkg/dynamictools/docs/README.md)
 - [src/services/README.md](../src/services/README.md)

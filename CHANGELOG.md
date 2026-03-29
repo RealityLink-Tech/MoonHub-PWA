@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Documentation - 2026-03-30
+
+- **Dynamic tools** — `docs/README.md` (subsystem table, `dynamicToolsService` in quick ref), `docs/services.md` (MoonHubClient + `dynamicToolsService`), `docs/ARCHITECTURE.md` (API list, `DynamicRenderer`, folder layout). `src/services/README.md` — `dynamicTools.ts`. Root READMEs — Space + dynamic tools line.
+
 ### Added / fixed - 2026-03-29
 
 - **Client ↔ API alignment** — `pair()` uses `POST /api/auth/pair`; `verifyToken()` uses `POST /api/auth/verify`. Subnet discovery scans **18800** first (MoonHub default).

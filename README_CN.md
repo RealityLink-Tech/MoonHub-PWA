@@ -17,7 +17,7 @@ MoonHub PWA 是面向 **MoonHub AI 助手设备** 的渐进式 Web 应用：多�
 - **多模态对话** — 文字、语音（Web Speech 与可选录音）、图片；助手回复 **Markdown**（GFM）渲染；`system_notice` 使用独立组件。详见 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)。
 - **频道（设置）** — 通过 MoonHub `/api/channels` 系列接口管理频道实例（局域网）。详见 [`docs/services.md`](docs/services.md) 与 MoonHub [`web/backend/api/README.md`](../MoonHub/web/backend/api/README.md)。
 - **AI 卡片** — 模型返回的结构化富媒体回复。
-- **Space 空间** — AI 动态生成界面（核心产品形态）。
+- **Space 空间** — AI 动态生成界面（核心产品形态）；来自 MoonHub `/api/dynamic-tools` 的**动态工具**由 **DynamicRenderer** 与 chat/space 组件集渲染。
 - **设置** — 主题、通知、设备管理。
 - **PWA** — 可安装、离线友好的应用壳（`vite-plugin-pwa`）。
 
@@ -70,7 +70,7 @@ src/
 ├── hooks/          # useDevice、useChat、useVoice、usePWA、useTheme、useAIUpdate
 ├── lib/            # 工具函数
 ├── pages/          # Splash、发现、配对、Chat、Space、Settings 等
-├── services/       # device、discovery、storage、voice、mock、componentRecommendation
+├── services/       # device、dynamicTools、discovery、storage、voice、mock、componentRecommendation
 ├── stores/         # device、chat、space、settings、ui
 ├── types/
 ├── App.tsx、AppInitializer.tsx、main.tsx、router.tsx、index.css

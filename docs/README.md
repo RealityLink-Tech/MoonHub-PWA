@@ -13,6 +13,8 @@ This page is the **entry point and reading guide** for the PWA frontend document
 
 **Chat UI**: assistant text uses [`MarkdownRenderer`](../src/components/MarkdownRenderer.tsx) (react-markdown + remark-gfm); `system_notice` messages use [`SystemNotice`](../src/components/SystemNotice.tsx) on the Chat page—see [ARCHITECTURE.md](./ARCHITECTURE.md#对话与消息呈现).
 
+**Dynamic tools**: [`dynamicToolsService`](../src/services/dynamicTools.ts) + [`DynamicRenderer`](../src/components/space/DynamicRenderer.tsx) and `components/chat/dynamic` / `components/space/dynamic`—see [ARCHITECTURE.md](./ARCHITECTURE.md#动态工具与-dynamicrenderer) and [services.md](./services.md).
+
 ## Documentation by Subsystem
 
 ### LAN Communication
@@ -43,12 +45,20 @@ This page is the **entry point and reading guide** for the PWA frontend document
 | 1 | [hooks.md](./hooks.md) | Custom React hooks reference |
 | 2 | [src/hooks/README.md](../src/hooks/README.md) | Quick reference for hooks directory |
 
+### Dynamic UI (AI tools)
+
+| Order | Document | Description |
+| --- | --- | --- |
+| 1 | [ARCHITECTURE.md](./ARCHITECTURE.md) | `DynamicRenderer`, chat/space dynamic folders, Space pages |
+| 2 | [services.md](./services.md) | `dynamicToolsService` and `MoonHubClient` `/api/dynamic-tools` methods |
+| 3 | MoonHub [`web/backend/api/README.md`](../../MoonHub/web/backend/api/README.md) | Authoritative HTTP contract |
+
 ## Project Structure
 
 ```
 MoonHub-PWA/
 ├── src/
-│   ├── components/     # React components
+│   ├── components/     # React components (chat/dynamic, space/dynamic, DynamicRenderer)
 │   ├── hooks/          # Custom hooks (`index.ts` re-exports)
 │   ├── lib/            # Shared utilities (e.g. `utils.ts`)
 │   ├── pages/          # Route-level pages
@@ -98,7 +108,8 @@ MoonHub-PWA/
 
 | Service | File | Purpose |
 |---------|------|---------|
-| MoonHubClient | `device.ts` | API communication (incl. `discoverDevices` / `getPairedDevices` / channel CRUD) |
+| MoonHubClient | `device.ts` | API communication (incl. `discoverDevices` / `getPairedDevices` / channel CRUD / **dynamic tools**) |
+| `dynamicToolsService` | `dynamicTools.ts` | List, generate, execute, schema, delete, pin dynamic tools |
 | DeviceDiscovery | `discovery.ts` | LAN HTTP port scan (WebRTC subnet; includes default port **18800**) |
 | StorageService | `storage.ts` | IndexedDB persistence |
 | VoiceService | `voice.ts` | Speech recognition/synthesis |

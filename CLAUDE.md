@@ -33,6 +33,7 @@ All stores use `getStorage()` from `src/services/storage.ts` for persistence (In
 
 **Key services**:
 - `discovery.ts` — LAN device scanning
+- `dynamicTools.ts` — `/api/dynamic-tools` (list, generate, execute, schema); used by Space + `DynamicRenderer`
 - `storage.ts` — persistence abstraction
 - `voice.ts` — Web Speech API integration
 - `mock.ts` — dev mock data
@@ -191,3 +192,6 @@ Rules:
 - Components use `motion/react` (Framer Motion) for transitions via `AnimatePresence`
 - IDs generated with `nanoid()`
 - API responses follow `{ success: boolean, data?: T, error?: ApiError }` pattern
+
+## Don't add it to the commit.
+Co-Authored-By: Claude Opus 4.6 noreply@anthropic.com

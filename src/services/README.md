@@ -8,6 +8,7 @@ PWA service layer for API communication, device discovery, storage, and hardware
 
 本目录包含所有与后端交互和本地存储的服务模块：
 - **device.ts** - MoonHub API 客户端
+- **dynamicTools.ts** - 动态工具 API（`/api/dynamic-tools`）
 - **discovery.ts** - 设备发现服务
 - **storage.ts** - IndexedDB 存储服务
 - **voice.ts** - 语音服务
@@ -19,6 +20,7 @@ PWA service layer for API communication, device discovery, storage, and hardware
 ```
 src/services/
 ├── device.ts       # MoonHub API 客户端
+├── dynamicTools.ts # 动态工具（generate / execute / schema）
 ├── discovery.ts    # 设备发现服务
 ├── storage.ts      # IndexedDB 存储
 ├── voice.ts        # 语音服务
@@ -72,6 +74,21 @@ await client.updateConfig({ theme: 'dark' })
 | `getChannels()` / `createChannel` / `updateChannel` / `deleteChannel` / `getChannelStatus` / `getChannelCatalog` | 频道 CRUD 与目录 |
 | `getConfig()` | 获取配置 |
 | `updateConfig(config)` | `PATCH /api/config` 部分更新 |
+| `listDynamicTools` / `generateDynamicTool` / `executeDynamicTool` 等 | `/api/dynamic-tools/*` |
+
+### dynamicToolsService (`dynamicTools.ts`)
+
+对 `getClient()` 返回的 `MoonHubClient` 的封装，供 Space 首页、详情与添加页使用。
+
+```typescript
+import { dynamicToolsService } from '@/services/dynamicTools'
+
+await dynamicToolsService.list('ai')
+await dynamicToolsService.generate('做一个天气卡片', 'space')
+await dynamicToolsService.execute(toolId, {}, 'space')
+```
+
+详见 [docs/services.md](../../docs/services.md)。
 
 ### DeviceDiscovery (`discovery.ts`)
 

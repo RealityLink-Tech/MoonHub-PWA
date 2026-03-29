@@ -36,6 +36,12 @@ MoonHub PWA 是一个渐进式 Web 应用，用于与 MoonHub AI 助手设备进
 - **助手文本**：[`MarkdownRenderer`](../src/components/MarkdownRenderer.tsx) 渲染流式与最终文本（react-markdown + remark-gfm，样式与 Tailwind 设计令牌对齐）。
 - **系统通知**：消息类型 `system_notice` 在 [`Chat` 页面](../src/pages/Chat.tsx) 中走 [`SystemNotice`](../src/components/SystemNotice.tsx)，用于配对提示等结构化提示（可选 `actions`）。
 
+### 动态工具与 DynamicRenderer
+
+- **API**：[`dynamicToolsService`](../src/services/dynamicTools.ts) 调用 MoonHub `/api/dynamic-tools`（列表、生成、执行、schema、删除、首页固定）。详见 [`services.md`](./services.md)。
+- **渲染**：[`DynamicRenderer`](../src/components/space/DynamicRenderer.tsx) 将后端返回的 `GeneratedComponent` 树映射为 React 节点；**Chat 层**轻量组件在 [`components/chat/dynamic/`](../src/components/chat/dynamic/)（如 `MetricSummary`、`ChartPreview`），**Space 层**完整组件在 [`components/space/dynamic/`](../src/components/space/dynamic/)（如图表、表格、看板、`ActionForm` 等）。
+- **页面**：[`Space.tsx`](../src/pages/Space.tsx)、[`SpaceDetail.tsx`](../src/pages/SpaceDetail.tsx)、[`SpaceAdd.tsx`](../src/pages/SpaceAdd.tsx) 组合 list / execute / schema 与 `DynamicRenderer`。
+
 ### 3. Space 空间（动态界面）
 - AI 生成 UI 组件
 - 组件动态渲染
@@ -56,11 +62,13 @@ src/
 │   │   ├── ConversationList.tsx
 │   │   ├── GeneratedCard.tsx
 │   │   ├── MessageBubble.tsx
-│   │   └── StreamingMessage.tsx
+│   │   ├── StreamingMessage.tsx
+│   │   └── dynamic/    # 动态工具（Chat 侧小组件）
 │   ├── MarkdownRenderer.tsx
 │   ├── SystemNotice.tsx
 │   ├── space/          # Space 组件
-│   │   └── DynamicRenderer.tsx
+│   │   ├── DynamicRenderer.tsx
+│   │   └── dynamic/    # 动态工具（Space 侧完整组件）
 │   ├── ui/             # 基础 UI 组件
 │   │   ├── button.tsx
 │   │   └── toast.tsx
@@ -85,6 +93,7 @@ src/
 ├── services/           # 服务层（按文件直接 import，无 `index.ts`）
 │   ├── device.ts
 │   ├── discovery.ts
+│   ├── dynamicTools.ts
 │   ├── storage.ts
 │   ├── voice.ts
 │   ├── mock.ts
@@ -134,6 +143,12 @@ PATCH /api/channels/{id}       # 更新频道
 DELETE /api/channels/{id}      # 删除频道
 GET  /api/channels/{id}/status # 频道状态
 GET  /api/channels/catalog     # 频道类型目录
+GET  /api/dynamic-tools        # 动态工具列表
+POST /api/dynamic-tools/generate
+POST /api/dynamic-tools/{id}/execute
+GET  /api/dynamic-tools/{id}/schema
+DELETE /api/dynamic-tools/{id}
+PATCH /api/dynamic-tools/{id}/home
 GET  /api/skills               # 技能列表
 POST /api/skills               # 安装技能
 GET  /api/models               # 模型列表

@@ -17,7 +17,7 @@ MoonHub PWA is a **progressive web app** for talking to MoonHub AI assistant dev
 - **Multimodal chat** — Text, voice (Web Speech + optional recording), and images; assistant replies rendered as **Markdown** (GFM); `system_notice` messages use a dedicated UI. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 - **Channels (settings)** — List/create/update/delete channel instances against MoonHub `/api/channels` APIs (LAN). See [`docs/services.md`](docs/services.md) and MoonHub [`web/backend/api/README.md`](../MoonHub/web/backend/api/README.md).
 - **AI cards** — Rich structured replies from the model.
-- **Space** — AI-generated dynamic layouts (core product surface).
+- **Space** — AI-generated dynamic layouts (core product surface); **dynamic tools** from MoonHub `/api/dynamic-tools` render via **DynamicRenderer** (chat + space component sets).
 - **Settings** — Theme, notifications, device management.
 - **PWA** — Installable, offline-friendly shell via `vite-plugin-pwa`.
 
@@ -70,7 +70,7 @@ src/
 ├── hooks/          # useDevice, useChat, useVoice, usePWA, useTheme, useAIUpdate
 ├── lib/            # utils
 ├── pages/          # Splash, discovery, pairing, Chat, Space, Settings, …
-├── services/       # device, discovery, storage, voice, mock, componentRecommendation
+├── services/       # device, dynamicTools, discovery, storage, voice, mock, componentRecommendation
 ├── stores/         # device, chat, space, settings, ui
 ├── types/
 ├── App.tsx, AppInitializer.tsx, main.tsx, router.tsx, index.css
