@@ -20,6 +20,14 @@ import { useSpaceStore } from '@/stores/space'
 import { useAIUpdate } from '@/hooks/useAIUpdate'
 import { cn } from '@/lib/utils'
 import { MetricSummary, StatusBadge, MiniList, QuickAction, ChartPreview } from '@/components/chat/dynamic'
+import { MetricCard } from '@/components/space/dynamic'
+import { SpaceLineChart } from '@/components/space/dynamic'
+import { SpaceBarChart } from '@/components/space/dynamic'
+import { DataTable } from '@/components/space/dynamic'
+import { StatusList } from '@/components/space/dynamic'
+import { ActionForm } from '@/components/space/dynamic'
+import { SpaceCalendar } from '@/components/space/dynamic'
+import { KanbanBoard } from '@/components/space/dynamic'
 
 interface DynamicRendererProps {
   components: GeneratedComponent[]
@@ -569,6 +577,18 @@ const componentRegistry: Record<string, ComponentType<ComponentProps>> = {
   'file-manager': FileManagerCard,
   'insights-collection': InsightsCollectionCard,
   'task-tracker': TaskTrackerCard,
+
+  // ============================================================
+  // Dynamic Tool Space Components
+  // ============================================================
+  'metric-card': MetricCard,
+  'line-chart': SpaceLineChart,
+  'bar-chart': SpaceBarChart,
+  'data-table': DataTable,
+  'status-list': StatusList,
+  'action-form': ActionForm,
+  'calendar': SpaceCalendar,
+  'kanban-board': KanbanBoard,
 }
 
 export function DynamicRenderer({ components }: DynamicRendererProps) {
