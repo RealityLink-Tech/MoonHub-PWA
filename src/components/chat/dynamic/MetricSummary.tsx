@@ -14,7 +14,7 @@ export function MetricSummary({ props }: MetricSummaryProps) {
   const isUp = direction === 'up'
 
   return (
-    <div className="bg-surface-container-low rounded-xl p-4 border border-outline-variant/10 shadow-sm">
+    <div className="max-w-[90%] md:max-w-[80%] bg-surface-container-low rounded-xl p-4 border border-outline-variant/10 shadow-sm">
       <p className="text-xs text-on-surface-variant mb-1">{title}</p>
       <div className="flex items-baseline gap-2">
         <span className="text-2xl font-bold text-on-surface">{value}</span>

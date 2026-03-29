@@ -22,9 +22,9 @@ export function ChartPreview({ props }: ChartPreviewProps) {
   }
 
   return (
-    <div className="bg-surface-container-low rounded-xl p-4 border border-outline-variant/10">
+    <div className="w-full max-w-full bg-surface-container-low rounded-xl p-4 border border-outline-variant/10">
       <p className="text-sm font-medium text-on-surface mb-3">{title}</p>
-      <div className="h-32">
+      <div className="h-32 w-full">
         <ResponsiveContainer width="100%" height="100%">
           {chartType === 'bar' ? (
             <BarChart data={data}>
