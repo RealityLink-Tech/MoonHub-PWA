@@ -265,3 +265,53 @@ export interface ChannelStatus {
   connectedSince?: number
   messageCount?: number
 }
+
+// ==================== Dynamic Tool Types ====================
+
+export interface DynamicTool {
+  id: string
+  name: string
+  description: string
+  category: string
+  chat_schema: GeneratedComponent
+  space_schema: GeneratedComponent
+  engine: 'schema' | 'wasm'
+  fetch_config?: FetchConfig
+  content_hash: string
+  is_ai_generated: boolean
+  is_on_home: boolean
+  version: number
+  created_at: number
+  updated_at: number
+}
+
+export interface FetchConfig {
+  source: 'api' | 'channel' | 'static'
+  url?: string
+  channel?: string
+  method?: string
+  headers?: Record<string, string>
+  body?: string
+  interval?: number
+}
+
+export interface GenerateResult {
+  tool_id: string
+  name: string
+  is_new: boolean
+  chat_schema: GeneratedComponent
+  space_schema: GeneratedComponent
+}
+
+export interface ExecutionResult {
+  schema: GeneratedComponent
+  data: Record<string, unknown>
+  expires?: number
+}
+
+export interface ToolUpdateEvent {
+  type: 'tool_update'
+  tool_id: string
+  data: Record<string, unknown>
+  schema: GeneratedComponent
+}
