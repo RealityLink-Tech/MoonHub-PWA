@@ -8,6 +8,8 @@ import { AnimatePresence } from 'motion/react'
 import { SplashPage } from '@/pages/Splash'
 import { ChatPage } from '@/pages/Chat'
 import { SpacePage, SpaceExtensionPage } from '@/pages/Space'
+import { SpaceAdd } from '@/pages/SpaceAdd'
+import { SpaceDetail } from '@/pages/SpaceDetail'
 import { SettingsPage } from '@/pages/Settings'
 import type { SettingsSubPage } from '@/pages/Settings'
 import { DeviceDiscoveryPage } from '@/pages/DeviceDiscovery'
@@ -28,6 +30,8 @@ export type ViewType =
   | 'chat'
   | 'space'
   | 'space_extension'
+  | 'space_add'
+  | 'space_detail'
   | 'account'
   | 'device_discovery'
   | 'device_connection'
@@ -41,6 +45,7 @@ export type ViewType =
 export function App() {
   const [view, setView] = useState<ViewType>('splash')
   const [previousView, setPreviousView] = useState<ViewType>('chat')
+  const [selectedToolId, setSelectedToolId] = useState<string | null>(null)
 
   const navigateTo = useCallback((newView: ViewType) => {
     setPreviousView(view)
@@ -93,10 +98,22 @@ export function App() {
           <ChatPage onAddClick={() => navigateTo('device_discovery')} onGoToSettings={() => navigateTo('settings_model')} />
         )}
         {view === 'space' && (
-          <SpacePage onAddClick={() => navigateTo('space_extension')} />
+          <SpacePage
+            onAddClick={() => navigateTo('space_add')}
+            onToolClick={(id) => { setSelectedToolId(id); navigateTo('space_detail') }}
+          />
         )}
         {view === 'space_extension' && (
           <SpaceExtensionPage onBack={() => navigateTo('space')} />
+        )}
+        {view === 'space_add' && (
+          <SpaceAdd
+            onBack={() => navigateTo('space')}
+            onToolSelect={(id) => { setSelectedToolId(id); navigateTo('space_detail') }}
+          />
+        )}
+        {view === 'space_detail' && selectedToolId && (
+          <SpaceDetail toolId={selectedToolId} onBack={() => navigateTo('space')} />
         )}
         {view === 'account' && (
           <SettingsPage
