@@ -19,6 +19,7 @@ import type { GeneratedComponent } from '@/types'
 import { useSpaceStore } from '@/stores/space'
 import { useAIUpdate } from '@/hooks/useAIUpdate'
 import { cn } from '@/lib/utils'
+import { MetricSummary, StatusBadge, MiniList, QuickAction, ChartPreview } from '@/components/chat/dynamic'
 
 interface DynamicRendererProps {
   components: GeneratedComponent[]
@@ -549,6 +550,15 @@ const componentRegistry: Record<string, ComponentType<ComponentProps>> = {
   'financial-overview': FinancialOverviewCard,
   'file-preview': FilePreviewCard,
   'code-block': CodeBlockCard,
+
+  // ============================================================
+  // Dynamic Tool Chat Cards
+  // ============================================================
+  'metric-summary': MetricSummary,
+  'status-badge': StatusBadge,
+  'mini-list': MiniList,
+  'quick-action': QuickAction,
+  'chart-preview': ChartPreview,
 
   // ============================================================
   // Space 组件
