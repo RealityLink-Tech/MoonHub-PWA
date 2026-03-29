@@ -1,7 +1,9 @@
+import type { ReactNode } from 'react'
 import { TrendingUp, TrendingDown } from 'lucide-react'
 
 interface MetricSummaryProps {
   props: Record<string, unknown>
+  children?: ReactNode
   componentId?: string
 }
 
@@ -20,7 +22,7 @@ export function MetricSummary({ props }: MetricSummaryProps) {
         <span className="text-2xl font-bold text-on-surface">{value}</span>
         {unit && <span className="text-sm text-on-surface-variant">{unit}</span>}
         {change !== 0 && (
-          <span className={`flex items-center gap-0.5 text-xs font-medium ${isUp ? 'text-green-600' : 'text-red-500'}`}>
+          <span className={`flex items-center gap-0.5 text-xs font-medium ${isUp ? 'text-primary' : 'text-error'}`}>
             {isUp ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
             {Math.abs(change)}%
           </span>

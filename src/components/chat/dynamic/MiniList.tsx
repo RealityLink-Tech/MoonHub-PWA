@@ -1,7 +1,9 @@
+import type { ReactNode } from 'react'
 import { ChevronRight } from 'lucide-react'
 
 interface MiniListProps {
   props: Record<string, unknown>
+  children?: ReactNode
   componentId?: string
 }
 

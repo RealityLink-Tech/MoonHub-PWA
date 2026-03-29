@@ -1,15 +1,17 @@
+import type { ReactNode } from 'react'
 import { CheckCircle, AlertTriangle, XCircle, Info } from 'lucide-react'
 
 interface StatusBadgeProps {
   props: Record<string, unknown>
+  children?: ReactNode
   componentId?: string
 }
 
 const statusConfig = {
-  success: { icon: CheckCircle, bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700' },
-  warning: { icon: AlertTriangle, bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700' },
-  error:   { icon: XCircle, bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700' },
-  info:    { icon: Info, bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700' },
+  success: { icon: CheckCircle, bg: 'bg-primary-container/30', border: 'border-primary/20', text: 'text-primary' },
+  warning: { icon: AlertTriangle, bg: 'bg-tertiary-container/30', border: 'border-tertiary/20', text: 'text-tertiary' },
+  error:   { icon: XCircle, bg: 'bg-error-container/30', border: 'border-error/20', text: 'text-error' },
+  info:    { icon: Info, bg: 'bg-secondary-container/30', border: 'border-secondary/20', text: 'text-secondary' },
 } as const
 
 export function StatusBadge({ props }: StatusBadgeProps) {

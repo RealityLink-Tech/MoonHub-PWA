@@ -7,10 +7,14 @@ import { useState } from 'react'
 
 interface KanbanItem { title: string; description?: string }
 interface KanbanColumn { title: string; items: KanbanItem[] }
-interface KanbanBoardProps { props: Record<string, unknown>; componentId?: string }
+interface KanbanBoardProps { props: Record<string, unknown>; children?: React.ReactNode; componentId?: string }
 
-function DraggableCard({ item }: { item: KanbanItem }) {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({ id: item.title })
+function getItemId(colIndex: number, itemIndex: number): string {
+  return `col-${colIndex}-item-${itemIndex}`
+}
+
+function DraggableCard({ item, id }: { item: KanbanItem; id: string }) {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({ id })
   const style = transform ? { transform: CSS.Translate.toString(transform) } : undefined
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="p-3 rounded-xl bg-surface-container-low border border-outline-variant/10 cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow">
@@ -37,9 +41,9 @@ export function KanbanBoard({ props, componentId }: KanbanBoardProps) {
                 <p className="text-sm font-semibold text-on-surface">{column.title}</p>
                 <p className="text-xs text-on-surface-variant">{column.items.length} 项</p>
               </div>
-              <SortableContext items={column.items.map((item) => item.title)} strategy={verticalListSortingStrategy}>
+              <SortableContext items={column.items.map((_, j) => getItemId(i, j))} strategy={verticalListSortingStrategy}>
                 <div className="space-y-2">
-                  {column.items.map((item) => <DraggableCard key={item.title} item={item} />)}
+                  {column.items.map((item, j) => <DraggableCard key={getItemId(i, j)} item={item} id={getItemId(i, j)} />)}
                 </div>
               </SortableContext>
             </div>

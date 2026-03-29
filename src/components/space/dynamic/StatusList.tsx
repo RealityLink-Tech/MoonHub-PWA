@@ -9,7 +9,7 @@ const statusIcons: Record<string, React.ComponentType<{ className?: string }>> =
   success: CheckCircle, error: XCircle, warning: AlertTriangle, pending: Clock,
 }
 const statusColors: Record<string, string> = {
-  success: 'text-green-500', error: 'text-red-500', warning: 'text-amber-500', pending: 'text-on-surface-variant',
+  success: 'text-primary', error: 'text-error', warning: 'text-tertiary', pending: 'text-on-surface-variant',
 }
 
 export function StatusList({ props, componentId }: StatusListProps) {

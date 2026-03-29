@@ -1,16 +1,29 @@
 import { useState } from 'react'
 import { useAIUpdate } from '@/hooks/useAIUpdate'
+import { getClient } from '@/services/device'
 import { Send } from 'lucide-react'
 
 interface Field { name: string; label: string; type?: string; placeholder?: string }
-interface ActionFormProps { props: Record<string, unknown>; componentId?: string }
+interface ActionFormProps { props: Record<string, unknown>; children?: React.ReactNode; componentId?: string }
 
 export function ActionForm({ props, componentId }: ActionFormProps) {
   const [data, setData] = useState(props)
   useAIUpdate(componentId || '', (newData) => setData(newData as Record<string, unknown>))
   const title = String(data.title || '操作面板')
+  const action = String(data.action || '')
   const fields = (Array.isArray(data.fields) ? data.fields as Field[] : [])
   const [values, setValues] = useState<Record<string, string>>({})
+
+  const handleSubmit = () => {
+    const pico = getClient()?.getPico()
+    if (pico && action) {
+      pico.send({
+        type: 'agent.action_execute',
+        payload: { action, component_id: componentId, values },
+      })
+    }
+  }
+
   return (
     <div className="rounded-[2rem] bg-surface-container-lowest p-8 shadow-[0_0_25px_rgba(212,228,247,0.4)] border border-white/40">
       <h3 className="text-xl font-bold text-on-surface mb-6">{title}</h3>
@@ -25,7 +38,7 @@ export function ActionForm({ props, componentId }: ActionFormProps) {
             )}
           </div>
         ))}
-        <button onClick={() => console.log('ActionForm submit:', values)} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-primary to-primary-dim text-on-primary text-sm font-medium shadow-lg shadow-primary/20 hover:scale-[1.01] transition-all active:scale-[0.98]">
+        <button onClick={handleSubmit} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-primary to-primary-dim text-on-primary text-sm font-medium shadow-lg shadow-primary/20 hover:scale-[1.01] transition-all active:scale-[0.98]">
           <Send className="w-4 h-4" /> 提交
         </button>
       </div>

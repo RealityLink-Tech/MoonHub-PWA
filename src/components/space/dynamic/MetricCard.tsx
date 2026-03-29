@@ -19,7 +19,7 @@ export function MetricCard({ props, componentId }: MetricCardProps) {
       <div className="flex items-start justify-between mb-6">
         <h3 className="text-xl font-bold text-on-surface">{title}</h3>
         {change !== 0 && (
-          <span className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${isUp ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'}`}>
+          <span className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${isUp ? 'bg-primary-container/40 text-primary' : 'bg-error-container/40 text-error'}`}>
             {isUp ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
             {Math.abs(change)}%
           </span>

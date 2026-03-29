@@ -562,18 +562,18 @@ export class MoonHubClient {
 
   async listDynamicTools(source?: string): Promise<ApiResponse<unknown>> {
     const query = source ? `?source=${source}` : ''
-    return this.request(`/api/dynamic-tools${query}`)
+    return this.request<unknown>(`/api/dynamic-tools${query}`)
   }
 
   async generateDynamicTool(prompt: string, context?: string): Promise<ApiResponse<unknown>> {
-    return this.request('/api/dynamic-tools/generate', {
+    return this.request<unknown>('/api/dynamic-tools/generate', {
       method: 'POST',
       body: JSON.stringify({ prompt, context }),
     })
   }
 
   async executeDynamicTool(toolId: string, params: Record<string, unknown>, mode?: string): Promise<ApiResponse<unknown>> {
-    return this.request(`/api/dynamic-tools/${toolId}/execute`, {
+    return this.request<unknown>(`/api/dynamic-tools/${toolId}/execute`, {
       method: 'POST',
       body: JSON.stringify({ params, mode }),
     })
@@ -581,15 +581,15 @@ export class MoonHubClient {
 
   async getDynamicToolSchema(toolId: string, mode?: string): Promise<ApiResponse<unknown>> {
     const query = mode ? `?mode=${mode}` : ''
-    return this.request(`/api/dynamic-tools/${toolId}/schema${query}`)
+    return this.request<unknown>(`/api/dynamic-tools/${toolId}/schema${query}`)
   }
 
   async deleteDynamicTool(toolId: string): Promise<ApiResponse<unknown>> {
-    return this.request(`/api/dynamic-tools/${toolId}`, { method: 'DELETE' })
+    return this.request<unknown>(`/api/dynamic-tools/${toolId}`, { method: 'DELETE' })
   }
 
   async setDynamicToolOnHome(toolId: string, onHome: boolean): Promise<ApiResponse<unknown>> {
-    return this.request(`/api/dynamic-tools/${toolId}/home`, {
+    return this.request<unknown>(`/api/dynamic-tools/${toolId}/home`, {
       method: 'PATCH',
       body: JSON.stringify({ on_home: onHome }),
     })

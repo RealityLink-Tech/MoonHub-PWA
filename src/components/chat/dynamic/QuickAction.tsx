@@ -1,8 +1,10 @@
+import type { ReactNode } from 'react'
 import { motion } from 'motion/react'
 import { Zap } from 'lucide-react'
 
 interface QuickActionProps {
   props: Record<string, unknown>
+  children?: ReactNode
   componentId?: string
 }
 

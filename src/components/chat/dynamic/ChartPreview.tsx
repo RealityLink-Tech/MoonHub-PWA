@@ -1,7 +1,9 @@
+import type { ReactNode } from 'react'
 import { LineChart, Line, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts'
 
 interface ChartPreviewProps {
   props: Record<string, unknown>
+  children?: ReactNode
   componentId?: string
 }
 
