@@ -253,12 +253,12 @@ export class MoonHubClient {
       })
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({}))
+        const errorBody = await response.json().catch(() => ({}))
         return {
           success: false,
           error: {
-            code: String(response.status),
-            message: error.message || response.statusText,
+            code: errorBody.error?.code || String(response.status),
+            message: errorBody.error?.message || (typeof errorBody.error === 'string' ? errorBody.error : '') || response.statusText,
           },
         }
       }
@@ -332,10 +332,23 @@ export class MoonHubClient {
   // ==================== Authentication ====================
 
   async pair(authCode: string): Promise<ApiResponse<{ token: string; device_id: string }>> {
-    return this.request('/api/auth/pair', {
-      method: 'POST',
-      body: JSON.stringify({ code: authCode }),
-    })
+    const raw = await this.request<{ token?: string; tokenExpiresAt?: string; device?: { id?: string } }>(
+      '/api/auth/pair',
+      {
+        method: 'POST',
+        body: JSON.stringify({ code: authCode }),
+      },
+    )
+    if (!raw.success || !raw.data) return raw as ApiResponse<{ token: string; device_id: string }>
+
+    // Normalize backend response shape
+    return {
+      success: true,
+      data: {
+        token: raw.data.token || '',
+        device_id: raw.data.device?.id || '',
+      },
+    }
   }
 
   async verifyToken(): Promise<ApiResponse<{ valid: boolean }>> {
