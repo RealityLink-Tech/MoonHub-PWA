@@ -172,7 +172,7 @@ export interface ApiError {
 // ==================== Streaming Types ====================
 
 export interface StreamChunk {
-  type: 'text' | 'card' | 'tool' | 'done' | 'error'
+  type: string
   content?: string
   data?: unknown
 }
