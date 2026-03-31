@@ -266,6 +266,18 @@ export interface ChannelStatus {
   messageCount?: number
 }
 
+// ==================== Channel Catalog Types ====================
+
+export interface ChannelCatalogItem {
+  name: string
+  config_key: string
+  variant?: string
+}
+
+export interface ChannelCatalogResponse {
+  channels: ChannelCatalogItem[]
+}
+
 // ==================== Dynamic Tool Types ====================
 
 export interface DynamicTool {

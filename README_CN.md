@@ -4,11 +4,15 @@
 
 **更新日志**：[`CHANGELOG.md`](CHANGELOG.md)
 
+**后端与设备项目**：[`../MoonHub/README.md`](../MoonHub/README.md) — 本应用所配套连接的 MoonHub 设备项目
+
 **[English](README.md)**
 
 ## 简介
 
-MoonHub PWA 是面向 **MoonHub AI 助手设备** 的渐进式 Web 应用：多模态对话、语音与图片、AI 卡片，以及核心能力 **Space**——由 Agent 动态生成的界面。
+> **你的 AI 助手——开箱即用，鲜活灵动，彼此连接。**
+
+MoonHub PWA 是 **MoonHub AI 助手设备的配套应用**。它帮助你快速完成配对、立即开始对话，并把 Agent 动态生成的界面带到可安装、离线友好的前端里。MoonHub 设备保持局域网优先，PWA 则提供多模态对话、语音与图片、AI 卡片，以及核心能力 **Space**。
 
 ## 核心功能
 
@@ -99,7 +103,8 @@ src/
 
 ## 相关项目
 
-- [MoonHub](https://github.com/RealityLink-Tech/MoonHub) — 主设备与后端
+- [`../MoonHub/README.md`](../MoonHub/README.md) — 主设备、后端与产品总览
+- [`../MoonHub/docs/README.md`](../MoonHub/docs/README.md) — 后端文档索引
 
 ## 许可证
 

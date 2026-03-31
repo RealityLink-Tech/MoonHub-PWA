@@ -11,6 +11,7 @@ import type {
   PairedDevice,
   ChannelInstance,
   ChannelStatus,
+  ChannelCatalogResponse,
 } from '@/types'
 import type {
   ChatRequest,
@@ -22,6 +23,7 @@ import type {
   SkillInfo,
   SystemInfo,
   ModelsResponse,
+  ToolSupportResponse,
 } from '@/types/api'
 
 /** Per-request options (not sent over the wire). */
@@ -491,6 +493,19 @@ export class MoonHubClient {
     })
   }
 
+  // ==================== Tools ====================
+
+  async getTools(): Promise<ApiResponse<ToolSupportResponse>> {
+    return this.request('/api/tools')
+  }
+
+  async updateToolState(name: string, enabled: boolean): Promise<ApiResponse<{ status: string }>> {
+    return this.request(`/api/tools/${encodeURIComponent(name)}/state`, {
+      method: 'PUT',
+      body: JSON.stringify({ enabled }),
+    })
+  }
+
   // ==================== Models ====================
 
   async getModels(): Promise<ApiResponse<ModelsResponse>> {
@@ -554,7 +569,7 @@ export class MoonHubClient {
     return this.request(`/api/channels/${id}/status`)
   }
 
-  async getChannelCatalog(): Promise<ApiResponse<unknown>> {
+  async getChannelCatalog(): Promise<ApiResponse<ChannelCatalogResponse>> {
     return this.request('/api/channels/catalog')
   }
 

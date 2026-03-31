@@ -15,11 +15,12 @@ import {
   Shield,
   Puzzle,
   Settings,
+  Wrench,
 } from 'lucide-react'
 import { Header } from '@/components/ui/Header'
 import { mockUser, mockSystemPreferences } from '@/services/mock'
 
-export type SettingsSubPage = 'devices' | 'model' | 'channels' | 'privacy' | 'skills' | 'system'
+export type SettingsSubPage = 'devices' | 'model' | 'channels' | 'privacy' | 'skills' | 'tools' | 'system'
 
 export function SettingsPage({
   onManageDevice,
@@ -103,6 +104,7 @@ export function SettingsPage({
                 Shield,
                 Puzzle,
                 Settings,
+                Wrench,
               }[item.icon] || Smartphone
               return (
                 <button

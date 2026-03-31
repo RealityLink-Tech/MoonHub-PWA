@@ -3,7 +3,7 @@
 // 设置二级页面组件
 // ============================================================
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion } from 'motion/react'
 import { ArrowLeft, Monitor, Smartphone, Laptop, WifiOff, Key, Star, ChevronDown, ChevronUp, Loader2, AlertCircle, Plus, Trash2 } from 'lucide-react'
 import {
@@ -14,7 +14,7 @@ import {
 import { useDeviceStore } from '@/stores'
 import { getClient } from '@/services/device'
 import type { ModelEntry } from '@/types/api'
-import type { ChannelInstance } from '@/types'
+import type { ChannelInstance, ChannelCatalogResponse } from '@/types'
 import { groupModelsByProvider, providerDisplayName, needsApiKey, extractProvider } from '@/lib/models'
 
 // ============================================================
@@ -139,6 +139,9 @@ export function ModelConfigPage({ onBack }: { onBack: () => void }) {
   // Routing config
   const [routingEnabled, setRoutingEnabled] = useState(false)
   const [tierMapping, setTierMapping] = useState<Record<string, string>>({})
+  const [tierBoundaries, setTierBoundaries] = useState<{ simple_moderate?: number; moderate_complex?: number; complex_reasoning?: number } | null>(null)
+  const [lightModel, setLightModel] = useState('')
+  const [threshold, setThreshold] = useState(0.5)
   const [routingSaving, setRoutingSaving] = useState(false)
 
   const TIER_INFO = [
@@ -174,6 +177,9 @@ export function ModelConfigPage({ onBack }: { onBack: () => void }) {
         if (routing) {
           setRoutingEnabled(!!routing.enabled)
           setTierMapping(routing.tier_mapping || {})
+          if (routing.tier_boundaries) setTierBoundaries(routing.tier_boundaries)
+          if (routing.light_model) setLightModel(routing.light_model)
+          if (routing.threshold != null) setThreshold(routing.threshold)
         }
       }
 
@@ -289,7 +295,7 @@ export function ModelConfigPage({ onBack }: { onBack: () => void }) {
     setRoutingSaving(true)
     const newEnabled = !routingEnabled
     const result = await client.updateConfig({
-      agents: { defaults: { routing: { enabled: newEnabled, tier_mapping: tierMapping } } },
+      agents: { defaults: { routing: { enabled: newEnabled } } },
     } as any)
     setRoutingSaving(false)
 
@@ -308,7 +314,7 @@ export function ModelConfigPage({ onBack }: { onBack: () => void }) {
     const newMapping = { ...tierMapping, [tier]: modelName }
     setRoutingSaving(true)
     const result = await client.updateConfig({
-      agents: { defaults: { routing: { enabled: routingEnabled, tier_mapping: newMapping } } },
+      agents: { defaults: { routing: { tier_mapping: newMapping } } },
     } as any)
     setRoutingSaving(false)
 
@@ -318,6 +324,69 @@ export function ModelConfigPage({ onBack }: { onBack: () => void }) {
       setError(result.error?.message || '更新路由配置失败')
     }
   }
+
+  // Handle tier boundary change (debounced)
+  const boundaryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const boundariesRef = useRef(tierBoundaries)
+  boundariesRef.current = tierBoundaries
+  const handleBoundaryChange = useCallback((key: string, value: number) => {
+    setTierBoundaries(prev => ({ ...(prev || {}), [key]: value }))
+    if (boundaryTimerRef.current) clearTimeout(boundaryTimerRef.current)
+    boundaryTimerRef.current = setTimeout(async () => {
+      const client = getClient()
+      if (!client) return
+      setRoutingSaving(true)
+      try {
+        const current = boundariesRef.current || {}
+        const result = await client.updateConfig({
+          agents: { defaults: { routing: { tier_boundaries: { ...current, [key]: value } } } },
+        } as any)
+        if (!result.success) setError(result.error?.message || '更新路由边界失败')
+      } finally {
+        setRoutingSaving(false)
+      }
+    }, 300)
+  }, [])
+
+  // Handle light model change
+  const handleLightModelChange = async (model: string) => {
+    const client = getClient()
+    if (!client) return
+
+    setRoutingSaving(true)
+    try {
+      const result = await client.updateConfig({
+        agents: { defaults: { routing: { light_model: model } } },
+      } as any)
+      if (result.success) {
+        setLightModel(model)
+      } else {
+        setError(result.error?.message || '更新轻量模型失败')
+      }
+    } finally {
+      setRoutingSaving(false)
+    }
+  }
+
+  // Handle threshold change (debounced)
+  const thresholdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const handleThresholdChange = useCallback((value: number) => {
+    setThreshold(value)
+    if (thresholdTimerRef.current) clearTimeout(thresholdTimerRef.current)
+    thresholdTimerRef.current = setTimeout(async () => {
+      const client = getClient()
+      if (!client) return
+      setRoutingSaving(true)
+      try {
+        const result = await client.updateConfig({
+          agents: { defaults: { routing: { threshold: value } } },
+        } as any)
+        if (!result.success) setError(result.error?.message || '更新阈值失败')
+      } finally {
+        setRoutingSaving(false)
+      }
+    }, 300)
+  }, [])
 
   // Get auth method badge text
   const getAuthBadge = (model: ModelEntry): string => {
@@ -395,6 +464,14 @@ export function ModelConfigPage({ onBack }: { onBack: () => void }) {
 
               {routingEnabled && (
                 <div className="px-4 pb-4 pt-2 border-t border-outline-variant/10 space-y-3">
+                  {/* Routing mode indicator */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary-container/30 text-primary font-medium">
+                      {Object.keys(tierMapping).length > 0 ? '四档路由 (tier_mapping)' : '轻量模型 + 阈值'}
+                    </span>
+                  </div>
+
+                  {/* Tier mapping (V2 four-tier) */}
                   {TIER_INFO.map(tier => (
                     <div key={tier.key}>
                       <div className="flex items-center justify-between mb-1">
@@ -419,6 +496,81 @@ export function ModelConfigPage({ onBack }: { onBack: () => void }) {
                       <p className="text-[10px] text-on-surface-variant/70 mt-0.5">{tier.desc}</p>
                     </div>
                   ))}
+
+                  {/* Tier boundaries */}
+                  {tierBoundaries && (
+                    <div className="pt-2 border-t border-outline-variant/10 space-y-3">
+                      <p className="text-xs font-medium text-on-surface">档位边界</p>
+                      {(['simple_moderate', 'moderate_complex', 'complex_reasoning'] as const).map(key => {
+                        const labels: Record<string, string> = {
+                          simple_moderate: '简单 → 日常',
+                          moderate_complex: '日常 → 复杂',
+                          complex_reasoning: '复杂 → 推理',
+                        }
+                        return (
+                          <div key={key}>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-[11px] text-on-surface-variant">{labels[key]}</span>
+                              <span className="text-[11px] text-on-surface font-medium">{tierBoundaries[key]?.toFixed(2) || '—'}</span>
+                            </div>
+                            <input
+                              type="range"
+                              min={0}
+                              max={1}
+                              step={0.05}
+                              value={tierBoundaries[key] ?? 0.5}
+                              onChange={(e) => handleBoundaryChange(key, parseFloat(e.target.value))}
+                              disabled={routingSaving}
+                              className="w-full h-1.5 bg-surface-container-high rounded-full appearance-none cursor-pointer accent-primary disabled:opacity-50"
+                            />
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+
+                  {/* V1 legacy: light model + threshold */}
+                  {(lightModel || threshold !== 0.5) && (
+                    <div className="pt-2 border-t border-outline-variant/10 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-medium">
+                          轻量模型模式 (V1 兼容)
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-xs font-medium text-on-surface block mb-1">轻量模型</span>
+                        <select
+                          value={lightModel}
+                          onChange={(e) => handleLightModelChange(e.target.value)}
+                          disabled={routingSaving || configuredModels.length === 0}
+                          className="w-full px-3 py-2 rounded-lg bg-surface-container-high border border-outline-variant/20 text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50"
+                        >
+                          <option value="">未设置</option>
+                          {configuredModels.map(m => (
+                            <option key={m.model_name} value={m.model_name}>
+                              {m.model_name} ({providerDisplayName(extractProvider(m.model))})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-medium text-on-surface">阈值</span>
+                          <span className="text-[11px] text-on-surface font-medium">{threshold.toFixed(2)}</span>
+                        </div>
+                        <input
+                          type="range"
+                          min={0}
+                          max={1}
+                          step={0.05}
+                          value={threshold}
+                          onChange={(e) => handleThresholdChange(parseFloat(e.target.value))}
+                          disabled={routingSaving}
+                          className="w-full h-1.5 bg-surface-container-high rounded-full appearance-none cursor-pointer accent-primary disabled:opacity-50"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -685,19 +837,64 @@ export function ModelConfigPage({ onBack }: { onBack: () => void }) {
 // Channels Page
 // ============================================================
 
-interface ChannelCatalog {
-  types: Array<{
-    type: string
-    name: string
-    description: string
-    config_fields: Array<{
-      key: string
-      label: string
-      type: string
-      required: boolean
-      placeholder?: string
-    }>
-  }>
+// PWA-side config field definitions for common channel types
+const CHANNEL_CONFIG_FIELDS: Record<string, Array<{
+  key: string; label: string; type: string; required: boolean; placeholder?: string
+}>> = {
+  telegram: [
+    { key: 'bot_token', label: 'Bot Token', type: 'password', required: true, placeholder: '输入 Telegram Bot Token' },
+  ],
+  discord: [
+    { key: 'bot_token', label: 'Bot Token', type: 'password', required: true, placeholder: '输入 Discord Bot Token' },
+  ],
+  slack: [
+    { key: 'bot_token', label: 'Bot Token', type: 'password', required: true, placeholder: '输入 Slack Bot Token' },
+  ],
+  feishu: [
+    { key: 'app_id', label: 'App ID', type: 'text', required: true, placeholder: '输入飞书 App ID' },
+    { key: 'app_secret', label: 'App Secret', type: 'password', required: true, placeholder: '输入飞书 App Secret' },
+  ],
+  dingtalk: [
+    { key: 'client_id', label: 'Client ID', type: 'text', required: true, placeholder: '输入钉钉 Client ID' },
+    { key: 'client_secret', label: 'Client Secret', type: 'password', required: true, placeholder: '输入钉钉 Client Secret' },
+  ],
+  line: [
+    { key: 'channel_access_token', label: 'Channel Access Token', type: 'password', required: true, placeholder: '输入 LINE Channel Access Token' },
+    { key: 'channel_secret', label: 'Channel Secret', type: 'password', required: true, placeholder: '输入 LINE Channel Secret' },
+  ],
+  qq: [
+    { key: 'app_id', label: 'App ID', type: 'text', required: true, placeholder: '输入 QQ App ID' },
+    { key: 'app_secret', label: 'App Secret', type: 'password', required: true, placeholder: '输入 QQ App Secret' },
+  ],
+  wecom: [
+    { key: 'corp_id', label: 'Corp ID', type: 'text', required: true, placeholder: '输入企业微信 Corp ID' },
+    { key: 'corp_secret', label: 'Corp Secret', type: 'password', required: true, placeholder: '输入企业微信 Corp Secret' },
+    { key: 'agent_id', label: 'Agent ID', type: 'text', required: false, placeholder: '输入应用 Agent ID' },
+  ],
+  wecom_app: [
+    { key: 'corp_id', label: 'Corp ID', type: 'text', required: true, placeholder: '输入企业微信 Corp ID' },
+    { key: 'corp_secret', label: 'Corp Secret', type: 'password', required: true, placeholder: '输入企业微信 Corp Secret' },
+    { key: 'agent_id', label: 'Agent ID', type: 'text', required: true, placeholder: '输入应用 Agent ID' },
+  ],
+  wecom_aibot: [
+    { key: 'corp_id', label: 'Corp ID', type: 'text', required: true, placeholder: '输入企业微信 Corp ID' },
+  ],
+  whatsapp: [
+    { key: 'phone_number_id', label: 'Phone Number ID', type: 'text', required: true, placeholder: '输入 WhatsApp Phone Number ID' },
+    { key: 'access_token', label: 'Access Token', type: 'password', required: true, placeholder: '输入 WhatsApp Access Token' },
+  ],
+  matrix: [
+    { key: 'homeserver_url', label: 'Homeserver URL', type: 'text', required: true, placeholder: 'https://matrix.example.com' },
+    { key: 'access_token', label: 'Access Token', type: 'password', required: true, placeholder: '输入 Matrix Access Token' },
+  ],
+  irc: [
+    { key: 'server', label: 'Server', type: 'text', required: true, placeholder: 'irc.example.com' },
+    { key: 'port', label: 'Port', type: 'text', required: false, placeholder: '6667' },
+    { key: 'nick', label: 'Nickname', type: 'text', required: true, placeholder: '输入 IRC 昵称' },
+  ],
+  onebot: [
+    { key: 'ws_url', label: 'WebSocket URL', type: 'text', required: true, placeholder: 'ws://localhost:8080' },
+  ],
 }
 
 export function ChannelsPage({ onBack }: { onBack: () => void }) {
@@ -705,7 +902,7 @@ export function ChannelsPage({ onBack }: { onBack: () => void }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
-  const [catalog, setCatalog] = useState<ChannelCatalog | null>(null)
+  const [catalog, setCatalog] = useState<ChannelCatalogResponse | null>(null)
   const [selectedType, setSelectedType] = useState<string | null>(null)
   const [adding, setAdding] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
@@ -749,7 +946,7 @@ export function ChannelsPage({ onBack }: { onBack: () => void }) {
 
         const result = await client.getChannelCatalog()
         if (result.success && result.data) {
-          setCatalog(result.data as ChannelCatalog)
+          setCatalog(result.data)
         }
       }
 
@@ -835,7 +1032,8 @@ export function ChannelsPage({ onBack }: { onBack: () => void }) {
     }
   }
 
-  const selectedChannelType = catalog?.types.find(t => t.type === selectedType)
+  const selectedChannelType = catalog?.channels.find(c => c.name === selectedType)
+  const selectedConfigFields = selectedChannelType ? (CHANNEL_CONFIG_FIELDS[selectedChannelType.config_key] || []) : []
 
   return (
     <motion.div
@@ -970,22 +1168,24 @@ export function ChannelsPage({ onBack }: { onBack: () => void }) {
                   <div className="space-y-3">
                     <p className="text-xs text-on-surface-variant">选择频道类型</p>
                     <div className="grid grid-cols-2 gap-2">
-                      {catalog.types.map((type) => (
+                      {catalog.channels.map((channel) => (
                         <button
-                          key={type.type}
+                          key={channel.name}
                           onClick={() => {
-                            setSelectedType(type.type)
-                            setAddForm({ ...addForm, type: type.type })
+                            setSelectedType(channel.name)
+                            setAddForm({ ...addForm, type: channel.config_key })
                           }}
                           className={`p-3 rounded-xl border border-outline-variant/20 text-left transition-colors hover:border-primary/50 ${
-                            addForm.type === type.type ? 'border-primary bg-primary-container/20' : 'bg-surface-container-high'
+                            addForm.type === channel.config_key ? 'border-primary bg-primary-container/20' : 'bg-surface-container-high'
                           }`}
                         >
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xl">{getChannelIcon(type.type)}</span>
-                            <span className="text-sm font-medium text-on-surface">{type.name}</span>
+                            <span className="text-xl">{getChannelIcon(channel.name)}</span>
+                            <span className="text-sm font-medium text-on-surface capitalize">{channel.name}</span>
                           </div>
-                          <p className="text-[10px] text-on-surface-variant line-clamp-2">{type.description}</p>
+                          {channel.variant && (
+                            <p className="text-[10px] text-on-surface-variant">{channel.variant}</p>
+                          )}
                         </button>
                       ))}
                     </div>
@@ -1009,8 +1209,10 @@ export function ChannelsPage({ onBack }: { onBack: () => void }) {
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-2xl">{getChannelIcon(selectedType)}</span>
                       <div>
-                        <p className="text-sm font-medium text-on-surface">{selectedChannelType.name}</p>
-                        <p className="text-xs text-on-surface-variant">{selectedChannelType.description}</p>
+                        <p className="text-sm font-medium text-on-surface capitalize">{selectedChannelType.name}</p>
+                        {selectedChannelType.variant && (
+                          <p className="text-xs text-on-surface-variant">{selectedChannelType.variant}</p>
+                        )}
                       </div>
                     </div>
 
@@ -1022,24 +1224,30 @@ export function ChannelsPage({ onBack }: { onBack: () => void }) {
                       className="w-full px-3 py-2 rounded-lg bg-surface-container-high border border-outline-variant/20 text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-on-surface-variant/50"
                     />
 
-                    {selectedChannelType.config_fields.map((field) => (
-                      <input
-                        key={field.key}
-                        type={field.type === 'password' ? 'password' : 'text'}
-                        value={addForm.config[field.key] || ''}
-                        onChange={(e) => setAddForm({
-                          ...addForm,
-                          config: { ...addForm.config, [field.key]: e.target.value }
-                        })}
-                        placeholder={field.placeholder || field.label}
-                        className="w-full px-3 py-2 rounded-lg bg-surface-container-high border border-outline-variant/20 text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-on-surface-variant/50"
-                      />
-                    ))}
+                    {selectedConfigFields.length > 0 ? (
+                      selectedConfigFields.map((field) => (
+                        <input
+                          key={field.key}
+                          type={field.type === 'password' ? 'password' : 'text'}
+                          value={addForm.config[field.key] || ''}
+                          onChange={(e) => setAddForm({
+                            ...addForm,
+                            config: { ...addForm.config, [field.key]: e.target.value }
+                          })}
+                          placeholder={field.placeholder || field.label}
+                          className="w-full px-3 py-2 rounded-lg bg-surface-container-high border border-outline-variant/20 text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-on-surface-variant/50"
+                        />
+                      ))
+                    ) : (
+                      <div className="text-xs text-on-surface-variant px-1">
+                        此频道类型无需额外配置
+                      </div>
+                    )}
 
                     <div className="flex gap-2">
                       <button
                         onClick={handleAddChannel}
-                        disabled={adding || !addForm.name.trim() || !addForm.type}
+                        disabled={adding || !addForm.name.trim() || !addForm.type || selectedConfigFields.some(f => f.required && !addForm.config[f.key]?.trim())}
                         className="flex-1 py-2 rounded-lg bg-primary text-primary-on text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                       >
                         {adding ? (

@@ -10,6 +10,8 @@ This page is the **entry point and reading guide** for the PWA frontend document
 4. [Services](./services.md) — Service layer API reference (`MoonHubClient` paths aligned with MoonHub `web/backend/api`)
 5. [State Management](./stores.md) — Zustand stores reference
 6. [Hooks](./hooks.md) — Custom React hooks reference
+7. [MoonHub README](../../MoonHub/README.md) — product overview for the device/backend project this app connects to
+8. [MoonHub docs index](../../MoonHub/docs/README.md) — backend documentation reading guide and implementation status links
 
 **Chat UI**: assistant text uses [`MarkdownRenderer`](../src/components/MarkdownRenderer.tsx) (react-markdown + remark-gfm); `system_notice` messages use [`SystemNotice`](../src/components/SystemNotice.tsx) on the Chat page—see [ARCHITECTURE.md](./ARCHITECTURE.md#对话与消息呈现).
 
@@ -160,11 +162,12 @@ pnpm lint
 
 | Repository | Description |
 |------------|-------------|
-| MoonHub | Backend server |
+| [MoonHub](../../MoonHub/README.md) | Device, backend server, and product overview |
 | MoonHub-PWA | Frontend PWA |
 
 ## Related Documentation
 
+- [MoonHub Backend README](../../MoonHub/README.md)
 - [MoonHub Backend Docs](../../MoonHub/docs/README.md)
 - [LAN Discovery Status](../../MoonHub/docs/implementation/lan-discovery-status.md)
 - [LAN Pairing Status](../../MoonHub/docs/implementation/lan-pairing-status.md)

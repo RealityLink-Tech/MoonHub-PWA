@@ -90,7 +90,29 @@ export interface MemoryConfig {
 
 export interface RoutingConfig {
   enabled: boolean
-  strategy?: 'simple' | 'complex' | 'adaptive'
+  light_model?: string
+  threshold?: number
+  tier_mapping?: Record<string, string>
+  tier_boundaries?: {
+    simple_moderate?: number
+    moderate_complex?: number
+    complex_reasoning?: number
+  } | null
+}
+
+// ==================== Tools API ====================
+
+export interface ToolSupportItem {
+  name: string
+  description: string
+  category: string
+  config_key: string
+  status: 'enabled' | 'disabled' | 'blocked'
+  reason_code?: string
+}
+
+export interface ToolSupportResponse {
+  tools: ToolSupportItem[]
 }
 
 // ==================== Chat API ====================

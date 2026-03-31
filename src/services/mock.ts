@@ -110,6 +110,7 @@ export const mockSystemPreferences = [
   { id: 'devices', icon: 'Smartphone', label: '已连接设备' },
   { id: 'model', icon: 'Cpu', label: '模型配置' },
   { id: 'channels', icon: 'Network', label: '外部频道' },
+  { id: 'tools', icon: 'Wrench', label: '工具权限' },
   { id: 'privacy', icon: 'Shield', label: '隐私权限' },
   { id: 'skills', icon: 'Puzzle', label: 'Skill管理' },
   { id: 'system', icon: 'Settings', label: '系统配置' },

@@ -23,6 +23,7 @@ import {
   SkillsPage,
   SystemConfigPage,
 } from '@/components/settings/SettingsSubPages'
+import { ToolsPermissionsPage } from '@/components/settings/ToolsPermissionsPage'
 import { BottomNavBar } from '@/components/ui/BottomNavBar'
 
 export type ViewType =
@@ -39,6 +40,7 @@ export type ViewType =
   | 'settings_channels'
   | 'settings_privacy'
   | 'settings_skills'
+  | 'settings_tools'
   | 'settings_system'
 
 export function App() {
@@ -77,6 +79,8 @@ export function App() {
         return <PrivacyPage onBack={onBack} />
       case 'settings_skills':
         return <SkillsPage onBack={onBack} />
+      case 'settings_tools':
+        return <ToolsPermissionsPage onBack={onBack} />
       case 'settings_system':
         return <SystemConfigPage onBack={onBack} />
       default:

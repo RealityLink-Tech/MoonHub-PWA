@@ -4,11 +4,15 @@
 
 **Changelog**: [`CHANGELOG.md`](CHANGELOG.md)
 
+**Backend & Device Runtime**: [`../MoonHub/README.md`](../MoonHub/README.md) — the MoonHub device project this app pairs with
+
 **[中文文档](README_CN.md)**
 
 ## Introduction
 
-MoonHub PWA is a **progressive web app** for talking to MoonHub AI assistant devices on your local network: chat, voice, images, AI-generated cards, and **Space**—dynamic UIs built by the agent.
+> **Your AI assistant — instant, alive, connected.**
+
+MoonHub PWA is the **companion app** for MoonHub AI assistant devices. It helps you pair in minutes, start talking right away, and use dynamic interfaces the agent builds for you. Your MoonHub device stays local-first; the PWA gives it an installable, offline-friendly front end for chat, voice, images, AI-generated cards, and **Space**.
 
 ## Core features
 
@@ -99,7 +103,8 @@ Examples: `weather`, `code`, `list`, `link`, `status`.
 
 ## Related
 
-- [MoonHub](https://github.com/RealityLink-Tech/MoonHub) — device and backend
+- [`../MoonHub/README.md`](../MoonHub/README.md) — device, backend, and product overview
+- [`../MoonHub/docs/README.md`](../MoonHub/docs/README.md) — backend documentation index
 
 ## License
 
