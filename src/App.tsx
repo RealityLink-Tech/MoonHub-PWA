@@ -131,7 +131,7 @@ export function App() {
             onBack={() => navigateTo(previousView === 'chat' ? 'chat' : 'account')}
             onConnect={(ip?: string) => {
               if (ip) {
-                createClient(`http://${ip}:18790`)
+                createClient(ip.includes(':') ? `http://${ip}` : `http://${ip}:18790`)
               }
               navigateTo('device_connection')
             }}
