@@ -180,6 +180,8 @@ export function ChatPage({ onAddClick, onGoToSettings }: { onAddClick: () => voi
       const client = getClient()
       if (client) {
         try {
+          // Disconnect existing before reconnecting
+          client.disconnectPico()
           const newWs = client.connectPico(convId)
           picoWsRef.current = newWs
 

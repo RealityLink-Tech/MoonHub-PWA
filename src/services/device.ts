@@ -56,6 +56,8 @@ export class PicoWebSocket {
   private sessionId: string
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null
   private _isConnected = false
+  private reconnectAttempts = 0
+  private readonly maxReconnectAttempts = 10
   private messageQueue: PicoMessage[] = []
   private agentEventCallback: AgentEventCallback | null = null
   private connectionChangeCallback?: (connected: boolean) => void
@@ -79,7 +81,8 @@ export class PicoWebSocket {
   }
 
   connect(): void {
-    if (this.ws?.readyState === WebSocket.OPEN) return
+    // Clean up any existing connection first to avoid duplicates
+    this.disconnectInternal()
 
     const wsUrl = `${this.url}/api/chat/ws?session_id=${encodeURIComponent(this.sessionId)}&token=${encodeURIComponent(this.token)}`
 
@@ -92,6 +95,7 @@ export class PicoWebSocket {
 
     this.ws.onopen = () => {
       this._isConnected = true
+      this.reconnectAttempts = 0
       this.connectionChangeCallback?.(true)
       while (this.messageQueue.length > 0) {
         const msg = this.messageQueue.shift()!
@@ -125,8 +129,27 @@ export class PicoWebSocket {
       this.reconnectTimer = null
     }
     this.messageQueue = []
-    this.ws?.close()
-    this.ws = null
+    if (this.ws) {
+      this.ws.onclose = null
+      this.ws.onerror = null
+      this.ws.close()
+      this.ws = null
+    }
+    this._isConnected = false
+  }
+
+  /** Disconnect without triggering reconnect — used internally before creating a new connection. */
+  private disconnectInternal(): void {
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer)
+      this.reconnectTimer = null
+    }
+    if (this.ws) {
+      this.ws.onclose = null
+      this.ws.onerror = null
+      this.ws.close()
+      this.ws = null
+    }
     this._isConnected = false
   }
 
@@ -161,10 +184,15 @@ export class PicoWebSocket {
 
   private scheduleReconnect(): void {
     if (this.reconnectTimer) return
+    if (this.reconnectAttempts >= this.maxReconnectAttempts) return
+
+    this.reconnectAttempts++
+    const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts - 1), 30000)
+    const jitter = Math.random() * 1000
     this.reconnectTimer = setTimeout(() => {
       this.reconnectTimer = null
       this.connect()
-    }, 3000)
+    }, delay + jitter)
   }
 }
 
