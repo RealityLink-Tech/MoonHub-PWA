@@ -280,6 +280,17 @@ export class MoonHubClient {
         signal,
       })
 
+      if (response.status === 401) {
+        this.authToken = undefined
+        return {
+          success: false,
+          error: {
+            code: 'TOKEN_EXPIRED',
+            message: '认证已过期，请重新配对',
+          },
+        }
+      }
+
       if (!response.ok) {
         const errorBody = await response.json().catch(() => ({}))
         return {
