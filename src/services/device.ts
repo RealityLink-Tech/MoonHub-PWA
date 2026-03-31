@@ -214,6 +214,10 @@ export class MoonHubClient {
     this.authToken = token
   }
 
+  getBaseUrl(): string {
+    return this.baseUrl
+  }
+
   private async request<T>(
     path: string,
     options: RequestInit = {},

@@ -85,6 +85,7 @@ export function useDevice() {
           const pairedDevice: PairedDevice = {
             ...device,
             authToken: response.data.token,
+            baseUrl: client.getBaseUrl(),
             pairedAt: Date.now(),
           }
 

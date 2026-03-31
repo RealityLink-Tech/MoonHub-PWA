@@ -26,6 +26,7 @@ export type DeviceCapability =
 
 export interface PairedDevice extends Device {
   authToken: string
+  baseUrl: string
   pairedAt: number
   alias?: string
 }

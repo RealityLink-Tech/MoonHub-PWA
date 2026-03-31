@@ -7,6 +7,8 @@ import { useState, useRef } from 'react'
 import { motion } from 'motion/react'
 import { ArrowLeft, HelpCircle, Router, Zap } from 'lucide-react'
 import { getClient } from '@/services/device'
+import { useDeviceStore } from '@/stores'
+import type { PairedDevice } from '@/types'
 
 export function DeviceConnectionPage({
   onBack,
@@ -73,6 +75,23 @@ export function DeviceConnectionPage({
       const result = await client.pair(fullCode)
       if (result.success && result.data) {
         client.setAuthToken(result.data.token)
+
+        // Persist paired device to store (survives reload)
+        const { pairDevice, connect } = useDeviceStore.getState()
+        const device: PairedDevice = {
+          id: result.data.device_id || crypto.randomUUID(),
+          name: 'MoonHub Device',
+          address: client.getBaseUrl(),
+          version: '',
+          status: 'online',
+          lastSeen: Date.now(),
+          capabilities: [],
+          authToken: result.data.token,
+          baseUrl: client.getBaseUrl(),
+          pairedAt: Date.now(),
+        }
+        await pairDevice(device)
+        connect(device)
         onFinish()
       } else {
         setError(result.error?.message || '授权码无效，请重试')
