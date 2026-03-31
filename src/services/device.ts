@@ -409,7 +409,12 @@ export class MoonHubClient {
         const lines = buffer.split('\n')
         buffer = lines.pop() || ''
 
+        let currentEvent = ''
         for (const line of lines) {
+          if (line.startsWith('event: ')) {
+            currentEvent = line.slice(7).trim()
+            continue
+          }
           if (line.startsWith('data: ')) {
             const data = line.slice(6)
             if (data === '[DONE]') {
@@ -420,12 +425,17 @@ export class MoonHubClient {
             }
 
             try {
-              const chunk: StreamChunk = JSON.parse(data)
+              const parsed = JSON.parse(data)
+              const chunk: StreamChunk = {
+                type: currentEvent || parsed.type || 'chunk',
+                data: parsed,
+              }
               callback?.(chunk)
               yield chunk
             } catch {
               // Skip invalid JSON
             }
+            currentEvent = '' // reset for next event
           }
         }
       }
