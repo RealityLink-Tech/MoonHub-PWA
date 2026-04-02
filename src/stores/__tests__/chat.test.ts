@@ -43,7 +43,7 @@ describe('useChatStore', () => {
     // Fire 10 concurrent addMessage calls and verify all 10 land in state.
     // Each call uses a single set() callback inside addMessage, reading
     // state.messages inside the callback for atomic updates.
-    const promises = []
+    const promises: Promise<unknown>[] = []
     for (let i = 0; i < 10; i++) {
       promises.push(
         useChatStore.getState().addMessage({

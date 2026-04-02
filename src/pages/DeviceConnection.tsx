@@ -22,9 +22,6 @@ export function DeviceConnectionPage({
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
   const handleInput = (index: number, value: string) => {
-    // Only allow alphanumeric (6-char code: XM8888)
-    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').replace(/[^A-Za-z0-9]/g, '').slice(0, 6)
-
     const newCode = [...code]
     newCode[index] = value.slice(-1) // Only take the last character
     setCode(newCode)
